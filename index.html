@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Basic HTML Setup</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        #graph {
+            width: 100%;
+            min-width: 1200px;
+            height: 80vh;
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        #graph-container, #overlays {
+            width: 100vw;
+            height: 80vh;
+            position: relative;
+            overflow-x: scroll;
+            scrollbar-width: none;
+        }
+
+        #overlays {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at top left,     rgba(255,255,255,1) 0px,   rgba(255,255,255,0) 80px),
+                radial-gradient(circle at top right,    rgba(255,255,255,1) 0px,   rgba(255,255,255,0) 80px),
+                radial-gradient(circle at bottom left,  rgba(255,255,255,1) 0px,   rgba(255,255,255,0) 80px),
+                radial-gradient(circle at bottom right, rgba(255,255,255,1) 0px,   rgba(255,255,255,0) 80px),
+                linear-gradient(to top,    rgba(255,255,255,1) 0px, rgba(255,255,255,0) 80px),
+                linear-gradient(to bottom, rgba(255,255,255,1) 0px, rgba(255,255,255,0) 80px),
+                linear-gradient(to left,   rgba(255,255,255,1) 0px, rgba(255,255,255,0) 80px),
+                linear-gradient(to right,  rgba(255,255,255,1) 0px, rgba(255,255,255,0) 80px);
+            background-blend-mode: lighten;
+        }
+
+        #overlay-top {
+            text-align: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #overlay-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 20px;
+            margin-left: -20px;
+        }
+        #overlay-left div {
+            margin-right: 40px;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            white-space: nowrap;
+        }
+        #overlay-right {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 20px;
+            margin-left: 20px;
+        }
+        #overlay-right div {
+            margin-left: 40px;
+            transform: rotate(90deg);
+            transform-origin: center;
+            white-space: nowrap;
+        }
+        #overlay-bottom {
+            text-align: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+        #content {
+            position: relative;
+            width: 100vw;
+            height: 80vh;
+        }
+
+        .node-container {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <div id="graph-container">
+            <div id="graph">
+            </div>
+        </div>
+        <div id="overlays">
+            <div id="overlay-top">Physical</div>
+            <div id="overlay-left"><div>Personal</div></div>
+            <div id="overlay-right"><div>Professional</div></div>
+            <div id="overlay-bottom">Digital</div>
+        </div>
+    </div>
+    
+    <script type="module" src="script.js"></script>
+</body>
+</html>
