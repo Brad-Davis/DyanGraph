@@ -3,12 +3,12 @@ import Node from './node.js';
 class Graph {
     constructor() {
         this.nodes = [
-            new Node('The Hollywood Reporter | Kelly Marie Tran', 100, -100, 150, 0, './kelly.jpg', 'https://www.google.com'),
-            new Node('Chromic Duo | Room of Oceans', 150, 200, 150, 150, './chromic.png', 'https://www.google.com'),
-            new Node('Hulu | Hellraiser', 400, -120, 150, 0, './hell.png', 'https://www.google.com'),
+            new Node('The Hollywood Reporter | Kelly Marie Tran', 100, -100, 150, 0, 'kelly.jpg', 'https://www.google.com'),
+            new Node('Chromic Duo | Room of Oceans', 150, 200, 150, 150, 'chromic.png', 'https://www.google.com'),
+            new Node('Hulu | Hellraiser', 400, -120, 150, 0, 'hell.png', 'https://www.google.com'),
         ];
         this.nodeContainers = new Map();
-        this.graphImgUrl = './graph.png';
+        this.graphImgUrl = 'graph.png';
         this.graph = document.getElementById('graph');
         this.mobileActiveNode = null; // Track which node is in mobile hover mode
         this.isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
