@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Basic HTML Setup</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -151,6 +152,16 @@
 
         .node-label .view-more {
             font-size: 8px;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+    
+           
+            
+            .node-container.node-hover {
+                transform: scale(1.5) !important;
+            }
         }
     </style>
 </head>
