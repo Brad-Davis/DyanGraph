@@ -8,7 +8,6 @@ class Graph {
             new Node('Hulu | Hellraiser', 400, -120, 150, 0, 'hell.png', 'https://www.google.com'),
         ];
         this.nodeContainers = new Map();
-        this.graphImgUrl = 'graph.png';
         this.graph = document.getElementById('graph');
         this.mobileActiveNode = null; // Track which node is in mobile hover mode
         this.isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -40,7 +39,6 @@ class Graph {
     }
 
     setupGraph() {
-        this.graph.style.backgroundImage = `url(${this.graphImgUrl})`;
     }
 
     addNode(node) {
