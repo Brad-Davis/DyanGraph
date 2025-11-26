@@ -103,6 +103,14 @@
             left: 0;
             width: 100%;
         }
+
+        #overlay-top div, #overlay-left div, #overlay-right div, #overlay-bottom div {
+             background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 20%, rgba(255,255,255,1) 80%, rgba(255,255,255,0) 100%);
+             display: inline-block;
+             border-radius: 50px;
+             padding: 10px;
+        }
+
         #content {
             position: relative;
             width: 100vw;
@@ -168,14 +176,14 @@
 <body>
     <div id="content">
         <div id="graph-container">
-            <div id="graph" style="background-image: url('graphV2.png');">
+            <div id="graph" style="background-image: url('graphV4.jpg');">
             </div>
         </div>
         <div id="overlays">
-            <div id="overlay-top">Physical</div>
-            <div id="overlay-left"><div>Personal</div></div>
-            <div id="overlay-right"><div>Professional</div></div>
-            <div id="overlay-bottom">Digital</div>
+            <div id="overlay-top"><div>PHYSICAL</div></div>
+            <div id="overlay-left"><div>PERSONAL</div></div>
+            <div id="overlay-right"><div>PROFESSIONAL</div></div>
+            <div id="overlay-bottom"><div>DIGITAL</div></div>
         </div>
     </div>
     
