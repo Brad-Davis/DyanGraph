@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic HTML Setup (Inline)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: "Montserrat", "proxima-nova", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        #graph {
+            width: 100%;
+            min-width: 1200px;
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        #graph-container, #overlays {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow-x: scroll;
+            scrollbar-width: none;
+        }
+
+        #overlays {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at top left,     rgba(255,255,255,1) 0px,   rgba(255,255,255,0) 80px),
+                radial-gradient(circle at top right,    rgba(255,255,255,1) 0px,   rgba(255,255,255,0) 80px),
+                radial-gradient(circle at bottom left,  rgba(255,255,255,1) 0px,   rgba(255,255,255,0) 80px),
+                radial-gradient(circle at bottom right, rgba(255,255,255,1) 0px,   rgba(255,255,255,0) 80px),
+                linear-gradient(to top,    rgba(255,255,255,1) 0px, rgba(255,255,255,0) 80px),
+                linear-gradient(to bottom, rgba(255,255,255,1) 0px, rgba(255,255,255,0) 80px),
+                linear-gradient(to left,   rgba(255,255,255,1) 0px, rgba(255,255,255,0) 80px),
+                linear-gradient(to right,  rgba(255,255,255,1) 0px, rgba(255,255,255,0) 80px);
+            background-blend-mode: lighten;
+        }
+
+        #overlay-top {
+            text-align: center;
+            position: absolute;
+            padding-top: 20px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #overlay-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 20px;
+            margin-left: -20px;
+        }
+        #overlay-left div {
+            margin-right: 40px;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            white-space: nowrap;
+        }
+        #overlay-right {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 20px;
+            margin-left: 20px;
+        }
+        #overlay-right div {
+            margin-left: 40px;
+            transform: rotate(90deg);
+            transform-origin: center;
+            white-space: nowrap;
+        }
+        #overlay-bottom {
+            text-align: center;
+            padding-bottom: 20px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+        #content {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .node-container {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            transform-origin: center;
+        }
+        
+        .node-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        
+        .node-container.node-hover {
+            transform: scale(1.7);
+            z-index: 10;
+        }
+        
+        .node-label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            text-align: center;
+            font-size: 12px;
+            display: flex;
+        }
+
+        .node-name {
+            margin: 15px;
+        }
+
+        .node-label .view-more {
+            font-size: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .node-container.node-hover {
+                transform: scale(1.5) !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <div id="graph-container">
+            <div id="graph" style="background-image: url('graphV2.png');">
+            </div>
+        </div>
+        <div id="overlays">
+            <div id="overlay-top">Physical</div>
+            <div id="overlay-left"><div>Personal</div></div>
+            <div id="overlay-right"><div>Professional</div></div>
+            <div id="overlay-bottom">Digital</div>
+        </div>
+    </div>
+    
+    <script>
+        class Node {
+            constructor(name, x, y, height, width, imgUrl, linkUrl) {
+                this.name = name;
+                this.x = x;
+                this.y = y;
+                this.height = height;
+                this.width = width;
+                this.imgUrl = imgUrl;
+                this.linkUrl = linkUrl;
+                this.isActive = false;
+            }
+
+            onHover() {
+                this.isActive = true;
+            }
+
+            onLeave() {
+                this.isActive = false;
+            }
+
+            onClick() {
+                window.open(this.linkUrl);
+            }
+        }
+
+        class Graph {
+            constructor() {
+                this.nodes = [
+                    new Node('The Hollywood Reporter | Kelly Marie Tran', 100, -100, 150, 0, 'kelly.jpg', 'https://www.google.com'),
+                    new Node('Chromic Duo | Room of Oceans', 150, 200, 150, 150, 'chromic.png', 'https://www.google.com'),
+                    new Node('Hulu | Hellraiser', 400, -120, 150, 0, 'hell.png', 'https://www.google.com'),
+                ];
+                this.nodeContainers = new Map();
+                this.graph = document.getElementById('graph');
+                this.mobileActiveNode = null;
+                this.isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                this.setupMobileClickOutside();
+                this.showNodes();
+            }
+
+            setupMobileClickOutside() {
+                if (this.isMobile) {
+                    this.graph.addEventListener('touchstart', (e) => {
+                        if (e.target === this.graph) {
+                            if (this.mobileActiveNode) {
+                                const prevContainer = this.nodeContainers.get(this.mobileActiveNode.name);
+                                if (prevContainer) {
+                                    prevContainer.classList.remove('node-hover');
+                                    const prevLabel = prevContainer.querySelector('.node-label');
+                                    if (prevLabel) {
+                                        prevLabel.style.opacity = 0;
+                                    }
+                                    this.mobileActiveNode.onLeave();
+                                }
+                                this.mobileActiveNode = null;
+                            }
+                        }
+                    });
+                }
+            }
+
+            setupGraph() {
+            }
+
+            addNode(node) {
+                this.nodes.push(node);
+            }
+
+            showNodes() {
+                const graphWidth = this.graph.clientWidth;
+                const graphHeight = this.graph.clientHeight;
+                
+                this.nodes.forEach(node => {
+                    let containerElement;
+                    let nodeElement;
+                    let labelElement;
+                    
+                    if (this.nodeContainers.has(node.name)) {
+                        containerElement = this.nodeContainers.get(node.name);
+                        nodeElement = containerElement.querySelector('img');
+                        labelElement = containerElement.querySelector('.node-label');
+                    } else {
+                        containerElement = document.createElement('div');
+                        containerElement.className = 'node-container';
+                        this.nodeContainers.set(node.name, containerElement);
+                        
+                        nodeElement = document.createElement('img');
+                        nodeElement.src = node.imgUrl;
+                        
+                        labelElement = document.createElement('div');
+                        labelElement.className = 'node-label';
+                        labelElement.innerHTML = '<span class="node-name">' + node.name + '<br <br>' + '<span class="view-more">— view —</span></span>';
+                        
+                        containerElement.appendChild(nodeElement);
+                        containerElement.appendChild(labelElement);
+                        
+                        containerElement.addEventListener('mouseenter', () => {
+                            node.onHover();
+                            containerElement.classList.add('node-hover');
+                            labelElement.style.opacity = 1;
+                        });
+                        
+                        containerElement.addEventListener('mouseleave', () => {
+                            node.onLeave();
+                            containerElement.classList.remove('node-hover');
+                            labelElement.style.opacity = 0;
+                        });
+                        
+                        if (this.isMobile) {
+                            containerElement.addEventListener('touchstart', (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (this.mobileActiveNode && this.mobileActiveNode !== node) {
+                                    const prevContainer = this.nodeContainers.get(this.mobileActiveNode.name);
+                                    if (prevContainer) {
+                                        prevContainer.classList.remove('node-hover');
+                                        const prevLabel = prevContainer.querySelector('.node-label');
+                                        if (prevLabel) {
+                                            prevLabel.style.opacity = 0;
+                                        }
+                                        this.mobileActiveNode.onLeave();
+                                    }
+                                }
+                                if (this.mobileActiveNode === node) {
+                                    node.onClick();
+                                    this.mobileActiveNode = null;
+                                    containerElement.classList.remove('node-hover');
+                                    labelElement.style.opacity = 0;
+                                    node.onLeave();
+                                } else {
+                                    this.mobileActiveNode = node;
+                                    node.onHover();
+                                    containerElement.classList.add('node-hover');
+                                    labelElement.style.opacity = 1;
+                                }
+                            });
+                        }
+                        
+                        containerElement.addEventListener('click', () => {
+                            if (!this.isMobile) {
+                                node.onClick();
+                            }
+                        });
+                        
+                        this.graph.appendChild(containerElement);
+                    }
+                    
+                    containerElement.style.left = `${node.x + graphWidth / 2}px`;
+                    containerElement.style.top = `${-node.y + graphHeight / 2}px`;
+                    
+                    if (node.width !== 0) {
+                        containerElement.style.width = `${node.width}px`;
+                        nodeElement.style.width = '100%';
+                    } else {
+                        containerElement.style.width = 'auto';
+                        nodeElement.style.width = 'auto';
+                    }
+                    
+                    if (node.height !== 0) {
+                        containerElement.style.height = `${node.height}px`;
+                        nodeElement.style.height = '100%';
+                    } else {
+                        containerElement.style.height = 'auto';
+                        nodeElement.style.height = 'auto';
+                    }
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const graph = new Graph();
+            graph.setupGraph();
+
+            function setScrollToHalfway() {
+                const graphContainer = document.getElementById('graph-container');
+                const graphEl = document.getElementById('graph');
+                
+                if (graphContainer && graphEl) {
+                    const scrollWidth = graphContainer.scrollWidth;
+                    const containerWidth = graphContainer.clientWidth;
+                    const halfwayPoint = (scrollWidth - containerWidth) / 2;
+                    
+                    graphContainer.scrollLeft = halfwayPoint;
+                }
+            }
+
+            setScrollToHalfway();
+
+            window.addEventListener('resize', () => {
+                setScrollToHalfway();
+                graph.showNodes();
+            });
+        });
+    </script>
+</body>
+</html>
+

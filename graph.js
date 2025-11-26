@@ -45,6 +45,19 @@ class Graph {
         this.nodes.push(node);
     }
 
+    shakeNode(nodeElement, node) {
+        if (node.isActive || this.isMobile) {
+            return;
+        }
+
+        nodeElement.style.transform = 'translate(' + Math.random() * 5 + 'px, ' + Math.random() * 5 + 'px)';
+            
+        setTimeout(() => {
+           
+            this.shakeNode(nodeElement, node);
+        }, 300);
+    }
+
     showNodes() {
         const graphWidth = this.graph.clientWidth;
         const graphHeight = this.graph.clientHeight;
@@ -79,13 +92,18 @@ class Graph {
                 
                 // Add hover event listeners (for desktop)
                 containerElement.addEventListener('mouseenter', () => {
-                    node.onHover();
+                    
+                    node.isActive = true;
                     containerElement.classList.add('node-hover');
+                    containerElement.style.transform = 'scale(1.7)';
                     labelElement.style.opacity = 1;
+                    node.onHover();
                 });
                 
                 containerElement.addEventListener('mouseleave', () => {
                     node.onLeave();
+                    node.isActive = false;
+                    this.shakeNode(containerElement, node);
                     containerElement.classList.remove('node-hover');
                     labelElement.style.opacity = 0;
                 });
@@ -140,6 +158,7 @@ class Graph {
             // Position and size the container
             containerElement.style.left = `${node.x + graphWidth / 2}px`;
             containerElement.style.top = `${-node.y + graphHeight / 2}px`;
+            this.shakeNode(containerElement, node);
             
             if (node.width !== 0) {
                 containerElement.style.width = `${node.width}px`;
@@ -157,7 +176,9 @@ class Graph {
                 nodeElement.style.height = 'auto';
             }
         });
+        
     }
+    
 }
 
 export default Graph;
