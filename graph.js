@@ -6,6 +6,14 @@ class Graph {
             new Node('The Hollywood Reporter | Kelly Marie Tran', 100, -100, 150, 0, 'kelly.jpg', 'https://www.google.com'),
             new Node('Chromic Duo | Room of Oceans', 150, 200, 150, 150, 'chromic.png', 'https://www.google.com'),
             new Node('Hulu | Hellraiser', 400, -120, 150, 0, 'hell.png', 'https://www.google.com'),
+            // Personal projects from dyanjong.com/personal
+            new Node('The Huntington | Green Boy 3D Scan', -150, -200, 150, 0, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/0ef745fa-a17f-450f-9040-a71a8a472463/7_31_2025-snapshot-2025-08-03_22-31-35.png', 'https://dyanjong.com/the-huntington-green-boy-3d-scan/'),
+            new Node('Reality Hack at MIT | Rescue Ready VR', -300, 100, 150, 0, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/fad14cde-c2ad-4650-b8b5-7db24ab0ae4f/RescueReadyVR_thumb.jpg', 'https://dyanjong.com/reality-hack-at-mit-rescue-ready-vr/'),
+            new Node('Postcard Cabins | Artist Fellowship', -200, 300, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/97afbe02-389b-4b19-958e-2b9dbba1c106/Getaway_flowers_s.jpg', 'https://dyanjong.com/postcard-cabins/'),
+            new Node('Rei Brown', 250, 250, 150, 0, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/faeadc19-9c20-4710-9c9d-93926011ad5f/ReiBrown2-snapshot-2025-09-02_19-24-20.png', 'https://dyanjong.com/rei-brown/'),
+            new Node('Cyanotypes', 500, 100, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1706141763759-0KH47QYMU06YYX1CJGF9/Dimples_alstroemeria_blue.jpg', 'https://dyanjong.com/cyanotypes/'),
+            new Node('Cinespace 2020 | Baobei', 300, -250, 150, 0, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1595052297041-VDOJ734PVI9RRFZ6AF1V/image-asset.jpeg', 'https://dyanjong.com/cinespace-2020-baobei/'),
+            new Node('ALBUMTONES', -100, -350, 150, 0, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/0974d602-851f-49ac-a079-ba4d5aa280e7/Screenshot+2025-12-01+at+9.12.32%E2%80%AFPM.png', 'https://dyanjong.com/albumtones/'),
         ];
         this.nodeContainers = new Map();
         this.graph = document.getElementById('graph');
