@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic HTML Setup (Inline)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: "Montserrat", "proxima-nova", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        #content {
+              margin-top: 0px;
+              height: 80vh !important;
+        }
+
+        #container-content {
+              padding: 0 !important;
+        }
+
+        #container {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .site-alignment-center #container {
+             margin-left: 0 !important;
+             margin-right: 0 !important;
+        }
+
+        #graph {
+            width: 100%;
+            min-width: 1200px;
+            height: 80vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        #graph-container, #overlays {
+            width: 100vw;
+            height: 80vh;
+            position: relative;
+            overflow-x: scroll;
+            scrollbar-width: none;
+        }
+
+        #overlays {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at top left,     rgba(255,255,255,1) 0px,   rgba(255,255,255,0) 80px),
+                radial-gradient(circle at top right,    rgba(255,255,255,1) 0px,   rgba(255,255,255,0) 80px),
+                radial-gradient(circle at bottom left,  rgba(255,255,255,1) 0px,   rgba(255,255,255,0) 80px),
+                radial-gradient(circle at bottom right, rgba(255,255,255,1) 0px,   rgba(255,255,255,0) 80px),
+                linear-gradient(to top,    rgba(255,255,255,1) 0px, rgba(255,255,255,0) 80px),
+                linear-gradient(to bottom, rgba(255,255,255,1) 0px, rgba(255,255,255,0) 80px),
+                linear-gradient(to left,   rgba(255,255,255,1) 0px, rgba(255,255,255,0) 80px),
+                linear-gradient(to right,  rgba(255,255,255,1) 0px, rgba(255,255,255,0) 80px);
+            background-blend-mode: lighten;
+        }
+
+        #overlay-top {
+            text-align: center;
+            position: absolute;
+            padding-top: 20px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        #overlay-top div {
+            white-space: nowrap;
+        }
+        #overlay-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 20px;
+            margin-left: -20px;
+        }
+        #overlay-left div {
+            margin-right: 40px;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            white-space: nowrap;
+        }
+        #overlay-right {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 20px;
+            margin-left: 20px;
+        }
+        #overlay-right div {
+            margin-left: 40px;
+            transform: rotate(90deg);
+            transform-origin: center;
+            white-space: nowrap;
+        }
+        #overlay-bottom {
+            text-align: center;
+            padding-bottom: 20px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        #overlay-bottom div {
+            white-space: nowrap;
+        }
+
+        /* #overlay-top div, #overlay-left div, #overlay-right div, #overlay-bottom div {
+             background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 20%, rgba(255,255,255,1) 80%, rgba(255,255,255,0) 100%);
+             display: inline-block;
+             border-radius: 50px;
+             padding: 10px;
+        } */
+
+        #content {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .node-container {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 1s ease;
+            transform-origin: center;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .node-container.node-hover {
+            transform: scale(1.7);
+            z-index: 10;
+        }
+        
+        .node-label {
+            line-height: 1.25em;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            text-align: center;
+            font-size: 12px;
+            display: flex;
+        }
+
+        .node-name {
+            margin: 15px;
+        }
+
+        .node-label .view-more {
+            font-size: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .node-container.node-hover {
+                transform: scale(1.5) !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <div id="graph-container">
+            <div id="graph" style="background-image: url('https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/7c339ef2-25d4-4ba5-b0d3-40850376f4fa/graphV5.jpg?content-type=image%2Fjpeg');">
+            </div>
+        </div>
+        <div id="overlays">
+            <div id="overlay-top"><div>PHYSICAL</div></div>
+            <div id="overlay-left"><div>PERSONAL</div></div>
+            <div id="overlay-right"><div>COMMISSIONED</div></div>
+            <div id="overlay-bottom"><div>DIGITAL</div></div>
+        </div>
+    </div>
+    
+    <script>
+        class Node {
+            constructor(name, x, y, width, height, imgUrl, linkUrl) {
+                this.name = name;
+                this.x = x;
+                this.y = y;
+                this.xTrans = 0;
+                this.yTrans = 0;
+                this.width = width;
+                this.height = height;
+                this.imgUrl = imgUrl;
+                this.linkUrl = linkUrl;
+                this.isActive = false;
+            }
+
+            onHover() {
+                this.isActive = true;
+            }
+
+            onLeave() {
+                this.isActive = false;
+            }
+
+            onClick() {
+                window.location.href = this.linkUrl;
+            }
+        }
+
+        class Graph {
+            constructor() {
+                // Placeholder image for nodes without image URLs (transparent 1x1 PNG)
+                const PLACEHOLDER_IMG = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9InRyYW5zcGFyZW50Ii8+PC9zdmc+';
+
+                this.nodes = [
+                    // Existing nodes with actual image URLs
+                    new Node('The Hollywood Reporter | Kelly Marie Tran', 180, -179, 118, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1614835547641-1I222O3CDK7T28KLXANK/THR-Cover-Issue-9-9cover.hires-2021-1614729091-compressed.jpg?format=1500w', 'https://dyanjong.com/#/the-hollywood-reporter-kelly-marie-tran/'), // DIGITAL COMMISIONED
+                    new Node('Chromic Duo | Room of Oceans', -76, 3, 100, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/089ab958-e587-4e15-9b64-54afbbf740c7/CD_Final_Flat_Highest-Res_RGB_10x10_M1.jpg?format=2500w', 'https://dyanjong.com/#/chromic-duo-room-of-oceans/'), // CENTER ZONE
+                    new Node('Hulu | Hellraiser', 406, -101, 118, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/f98e5254-17a0-48b7-bc4c-b6f202dde7ff/IMG_1935.jpg?format=2500w', 'https://dyanjong.com/#/hellraiser/'), // COMMISSIONED DIGITAL
+                    new Node('Decades <br> \(in space\)', -620, 211, 100, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/6d164d42-9d92-4b61-9f09-59e369f335eb/Decades_20231003_0001_A_black_edit+%282%29+copy.jpg?format=2500w', 'https://dyanjong.com/#/decades-in-space/'), // PERSONAL/COMMISIONED PHYSICAL
+                    new Node('NBA All Star Week - LukAI', 300, -194, 250, 102, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1740684037567-42172OX4WMOJGZ5PIZIK/SC04_Still_001.png?format=1500w', 'https://dyanjong.com/#/nba-all-star-week-lukai/'), // DIGITAL COMMISED
+                    new Node('T-Mobile - Channel Chillwave', 48, 0, 200, 115, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1760206670378-WMC8N99SRNNHIWQFVH9Q/Sequence+03.00_13_35_01.Still101.jpg?format=750w', 'https://dyanjong.com/#/tmobile-channel-chillwave/'), // DIGITAL/ SLIGTHLY PHYSICAL COMMISIONED
+                    new Node('T-Mobile - Wish You Were Here', 231, 84, 200, 135, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1740680235087-AGFJC2J23OG56N6GR1Y0/394A9407_edit.jpg?format=750w', 'https://dyanjong.com/#/tmobile-wish-you-were-here/'), //  PHYSICAL/DIGITAL COMMISIONED
+                    new Node('Reclaim The Flag Set Portraits', 241, 6, 200, 135, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/e449cfa5-70a2-425e-885f-a8003bc10e67/GeorgeTakei.jpg?format=750w', 'https://dyanjong.com/#/reclaim-the-flag-set-portraits/'), // COMMISIONED PYYSICAL/DIGITAL
+                    new Node('Rei Brown', -408, -9, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1687995700841-DLK5JHIDS91PDXPQVJHY/Rei_20230518_0006.jpg?format=1500w', 'https://dyanjong.com/#/rei-brown/'), // PYHSYICAL/DIGITAL PERSONAL
+                    new Node('Woosung', -401, 150, 100, 125, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1679960163520-M7WN41I4ADXW4VXMUF1C/02+-+WO_1280.jpg?format=1500w', 'https://dyanjong.com/#/woosung/'), // PERSONAL PHYSICAL MAINLY DIGITAL
+                    new Node('The Rose | HEAL', 259, 210, 125, 125, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1669100821234-T08793ZZD7UPO27EXTP2/TheROSE_Booklet_FOREST_M1.jpg?format=1500w', 'https://dyanjong.com/#/the-rose-heal/'), // commisioned physical
+                    new Node('LA Times | LA Dance Project', 274, 14, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/f23d152b-176f-4b55-95ce-0ada5d4b3a9d/DSC08580.jpg?format=1500w', 'https://dyanjong.com/#/la-times-la-dance-project/'), // commisioned physical/digital
+                    new Node('Dolly Ave | This Is Our Time', -43, -146, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/d4db426c-62db-49c2-ac52-fb3886c6353c/DA-Cover-Final.jpg?format=1500w', 'https://dyanjong.com/#/dolly-ave-this-is-our-time/'), // commisined/ a lil personal - digital
+                    new Node('TAAF | Heritage Heroes', 291, 148, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/16be9f89-41c0-4818-ae02-babd5c6b54b3/644c2d5acf851170b320f17f_HeritageHeroes-Ming-NaWen-8.jpg?format=1500w', 'https://dyanjong.com/#/taaf-heritage-heroes/'), // commisioned slightly more physical
+                    new Node('Japanese Breakfast | Paprika [Live]', 197, 82, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1653618850223-KZXU9SMSOOUOYGO0FFE4/JB.00_00_53_19.Still250.jpg?format=1500w', 'https://dyanjong.com/#/japanese-breakfast-paprika-live/'), // commisioned slightly more physical
+                    new Node('MC Jin | Stop The Hatred [Live]', 306, 154, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1653619755358-FQ8PMXWHM1N5HIM9RZY7/MCJ.00_02_00_02.Still110.jpg?format=1500w', 'https://dyanjong.com/#/mc-jin-stop-the-hatred-live/'), // commisioned slightly more physical
+                    new Node('FLAUNT | Mark Tuan', 3, 244, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1653619222543-U4ULRS9VA84TFXT7XUMI/Ver+4+Copy+01.00_05_17_06.Still045.jpg?format=1500w', 'https://dyanjong.com/#/flaunt-mark-tuan/'), // commisioned slightly more personal physical
+                    new Node('FLAUNT | Lana Condor', -30, 239, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1649095191188-04Q8N16YRRD8SHL651S2/LANA+FINAL+EDIT+Copy+01.00_00_14_22.Still002.jpg?format=1500w', 'https://dyanjong.com/#/flaunt-lana-condor/'), // commisioned slightly more personal physical
+                    new Node('Sunrise Canyon', -107, -200, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1644015761718-STV8K2JF6VPMHZOVSOW3/main_2_cycles.png?format=1500w', 'https://dyanjong.com/#/sunrise-canyon/'), // personal/commisioned right on the axis Digital
+                    new Node('Woosung | GENRE', 161, 71, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1638748907230-MX56HESBNXS75JNB6R0J/Woosung_Genre_10x10_300dpi_RGB_M1.jpg?format=1500w', 'https://dyanjong.com/#/woosung-genre/'), // Commissioned slighlty more physical/digital
+                    new Node('Dolly Ave | Press Photos', -60, 44, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1646853022122-114VY8FK7ZMG2YWIJHPK/DSC01385-edit.jpg?format=1500w', 'https://dyanjong.com/#/dolly-ave-press-photos/'), // 
+                    new Node('KLTKN x MIYAVI | Hush Hush ft. Kang Daniel', 322, -192, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1653621632640-EC2YNGO5FTJSBCY70FS9/Sequence+01.00_01_06_04.Still059.jpg?format=1500w', 'https://dyanjong.com/#/kltkn-x-miyavi-hush-hush-ft-kang-daniel/'), // commisioned digital very deep
+                    new Node('Joe Hisaishi | Ashitaka and San', 118, 2, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1638760600542-0P71BLY7QIJBKYWWUKRX/Screen+Shot+2021-09-09+at+12.52.06+AM.png?format=1500w', 'https://dyanjong.com/#/joe-hisaishi-ashitaka-and-san/'), // commisioned physical/digital
+                    new Node('JACOB COLLIER | DJESSE 3', 213, 212, 100, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1573414303386-Q2QQCB8E11XYME4YBGEW/JacobCollier_DJESSE3.jpg?format=1500w', 'https://dyanjong.com/#/jacob-collier-djesse-3/'), // physical commisioned
+                    new Node('MIYAVI | HOLY NIGHTS', 98, 13, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1586066649609-ZYJVZ9GVXW4R2SNRBP5M/MIYAVI_HolyNights_LIMITED-A-Cover_M1.jpg?format=1500w', 'https://dyanjong.com/#/miyavi-holy-nights/'), // commisioned physical/digital
+                    new Node('Emily Mei | Intro to Mei', 339, -200, 135, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1638749353882-SNP00ZWKGTMDLINSJLGB/image-asset.jpeg?format=1500w', 'https://dyanjong.com/#/emily-mei-intro-to-mei/'), // commisioned digital deep 
+                    new Node('AMAZON MUSIC JP | MIYAVI VIRTUAL 5.0: SYNTHESIS', 226, -200, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1644015888718-ZS4TDQ4EQ4049CBLT2EM/133663067_213446680395675_6691122370623387498_n.jpg?format=1500w', 'https://dyanjong.com/#/amazon-music-jp-miyavi-virtual-50-synthesis/'), // deep commisioned digital
+                    new Node('Hollis | Sedative Live', -13, -181, 150, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1589329705878-JDOYVKYMWGXTP0PKGYTN/892199038_1080.jpg?format=1500w', 'https://dyanjong.com/#/hollis-sedative-live/'), // lightly commisioned physical/digital more digtal
+                    new Node('Berhana | Golden Medley', 69, -147, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1584073462082-CYLZMY7DY95TPGAJTAYH/image-asset.jpeg?format=1500w', 'https://dyanjong.com/#/berhana-golden-medley/'), // commisioned digital
+                    new Node('Berhana | Lucky Strike', 21, -200, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1581709551715-XCBGJ9JX3SUCSZFKNJTI/image-asset.jpeg?format=1500w', 'https://dyanjong.com/#/berhana-lucky-strike/'), // commisioned digital
+                    new Node('Netflix | Emmys Party Motion Studio', 354, 204, 150, 115, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1569286486038-JLD3UM61X8075TDOXM7B/image-asset.jpeg?format=1500w', 'https://dyanjong.com/#/netflix-emmys-party-motion-studio/'), // commisioned physical
+                    new Node('Netflix | Stranger Things S3 Lookbook', 370, 250, 150, 115, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1569008052293-6OVLDLYFIZKDULE6K8EI/image-asset.jpeg?format=1500w', 'https://dyanjong.com/#/netflix-stranger-things-s3-lookbook/'), // commsioned physical
+                    new Node('Jessica Universe | Always', -137, 201, 135, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1579069136935-XCLIGJNZAP37EJXFUGI8/JU_Always.jpg?format=1500w', 'https://dyanjong.com/#/jessica-universe-always/'), // commisioned/personal physical
+                    new Node('FLAUNT | Poppy', -200, 26, 115, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1571599394547-Q6IRR8RNJS6VM6BSMG8I/167%2Bflaunt%2Bmagazine%2Bpoppy%2Bdigital%2Bv2.jpg?format=1500w', 'https://dyanjong.com/#/flaunt-poppy/'), // commisioned/personal physical/digital
+                    new Node('Kali Uchis | Dead to Me (Acoustic)', 36, 48, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1535330607257-MDGIVG2CO5458W8DJ4XY/Kali_cover.jpg?format=1500w', 'https://dyanjong.com/#/kali-uchis-dead-to-me-acoustic/'), // commisioned physical/digital
+                    new Node('QUIÑ | MATH (Director\'s Cut)', -186, 17, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1505811622130-BX0MUQIC9IUBK4A21QPN/image-asset.jpeg?format=1500w', 'https://dyanjong.com/#/quin-math-directors-cut/'), // commisioned/personal physical/digital
+                    new Node('QUIÑ | Galacticat', -218, -7, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1505812775480-9WYAUMXHL53SVMTZZFDG/image-asset.jpeg?format=1500w', 'https://dyanjong.com/#/quin-galacticat/'), // commisioned/personal physical/digital
+                    new Node('The Laterals | MIYAVI', -236, -24, 150, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1578025554776-DAG5FTK7X99YMHCN32YK/DSC09110.jpg?format=1500w', 'https://dyanjong.com/#/the-laterals-miyavi/'), // commisoned/personal more physical/digital
+                    new Node('BILLIE EILISH', -92, 242, 150, 95, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1540833062786-K9UMG56A7F5FBUOGABJX/Billie_light3.gif?format=1500w', 'https://dyanjong.com/#/billie-eilish/'), // personal/closer to commisioned physical
+                    new Node('The Laterals | Eve Hewson', -169, -42, 150, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1543086341795-OYNIDB26AW4EQEFVW0YW/DSC09852.jpg?format=1500w', 'https://dyanjong.com/#/the-laterals-eve-hewson/'), // commisioned/personal physical/close digital
+                    new Node('Character Media | Ian Alexander', 385, -200, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1581893390875-2AD498HE4VN3OFQJLVGH/IA_replica.gif?format=1500w', 'https://dyanjong.com/#/character-media-ian-alexander/'), //digital commisioned
+                    new Node('N.E.R.D.', -585, -189, 150, 50, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1535322126897-XK08TKAWOFU2HS9X0XOX/NERD_cover.jpg?format=1500w', 'https://dyanjong.com/#/nerd/'), // more personal but very digital
+                    new Node('SOME x Y', 404, -99, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1520636885475-LYM2YRB77S6Z5BQT2GG0/SXY2_smoketitle.gif?format=1500w', 'https://dyanjong.com/#/some-x-y/'), // commisioned mildly digital
+                    new Node('The Neighbourhood', 418, -173, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1520633919732-XHBAGDDJXGEVI0379HOW/NBHD_row.gif?format=1500w', 'https://dyanjong.com/#/the-neighbourhood/'), // commisioned digital
+                    new Node('The Laterals | Lili Reinhart', -153, -200, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1507743640395-OK1OS3LZYFS2F5SSF7KM/LR_01b.gif?format=1500w', 'https://dyanjong.com/#/the-laterals-lili-reinhart/'), //commisioned/personal digital
+                    new Node('PHOTOGENICS + CO | LUCID FW16', 435, 52, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1505813469799-80IIZFJPXO0LUFDNSNNH/Photogenics_title.gif?format=1500w', 'https://dyanjong.com/#/photogenics-co-lucid-fw16/'), //commisioned physical/digital
+                    new Node('The Huntington | Green Boy 3D Scan', -567, -88, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/0ef745fa-a17f-450f-9040-a71a8a472463/7_31_2025-snapshot-2025-08-03_22-31-35.png', 'https://dyanjong.com/the-huntington-green-boy-3d-scan/'), // personal slightly digital
+                    new Node('Reality Hack at MIT | Rescue Ready VR', -313, -148, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/fad14cde-c2ad-4650-b8b5-7db24ab0ae4f/RescueReadyVR_thumb.jpg', 'https://dyanjong.com/reality-hack-at-mit-rescue-ready-vr/'), // personal digital
+                    new Node('Postcard Cabins | Artist Fellowship', -551, 250, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/97afbe02-389b-4b19-958e-2b9dbba1c106/Getaway_flowers_s.jpg', 'https://dyanjong.com/postcard-cabins/'), // personal physical
+                    new Node('Cyanotypes', -537, 196, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1706141763759-0KH47QYMU06YYX1CJGF9/Dimples_alstroemeria_blue.jpg', 'https://dyanjong.com/cyanotypes/'), // personal physical
+                    new Node('Cinespace 2020 | Baobei', -344, -200, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1595052297041-VDOJ734PVI9RRFZ6AF1V/image-asset.jpeg', 'https://dyanjong.com/cinespace-2020-baobei/'), //personal digital
+                    new Node('ALBUMTONES', -519, -183, 150, 85, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/0974d602-851f-49ac-a079-ba4d5aa280e7/Screenshot+2025-12-01+at+9.12.32%E2%80%AFPM.png', 'https://dyanjong.com/albumtones/'), // personal digital
+                    
+                    //FIX THESE
+                    new Node('Readymade Cabret', -507, -200, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1706141763759-0KH47QYMU06YYX1CJGF9/Dimples_alstroemeria_blue.jpg', 'https://dyanjong.com/personal#/readymade-cabaret-20/'), // digital personal
+                    new Node('#SAVE OUR STAGES(AR)', -252, -200, 150, 150, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1706141763759-0KH47QYMU06YYX1CJGF9/Dimples_alstroemeria_blue.jpg', 'https://dyanjong.com/personal#/save-our-stages//'), // digital personal
+
+                    new Node("Spectrum (2023)", -283, 250, 'https://studiodyanjong.com/assets/images/image07.gif?v=c3941204', 'https://studiodyanjong.com/'), //personal physical
+                    new Node("Prototype II (2022)", -488, 250, 'https://studiodyanjong.com/assets/images/image16.jpg?v=c3941204', 'https://studiodyanjong.com/'), //personal physical
+                    new Node("Liminal Feelings (2021)", -393, 191, 'https://studiodyanjong.com/assets/images/image08.jpg?v=c3941204', 'https://studiodyanjong.com/'), //personal physical
+                    new Node("Welcome (2020)", -425, 250, 'https://studiodyanjong.com/assets/images/image17.gif?v=c3941204', 'https://studiodyanjong.com/'), //personal physical
+                    new Node("Beyond Garden (2020)", -297, -131, 'https://studiodyanjong.com/assets/images/image10.jpg?v=c3941204', 'https://studiodyanjong.com/'), //personal digital
+                    new Node("Prototype I (2020)", -473, 239, 'https://studiodyanjong.com/assets/images/image18.gif?v=c3941204', 'https://studiodyanjong.com/'), //personal physical
+                    new Node("Autonomy (2020)", -268, 250, 'https://studiodyanjong.com/assets/images/image13.jpg?v=c3941204', 'https://studiodyanjong.com/'), //personal physical
+                    new Node("Signal (2019)", -455, 197, 'https://studiodyanjong.com/assets/images/image19.gif?v=c3941204', 'https://studiodyanjong.com/'),//personal physical
+                    new Node("Arrival (2018)", -330, 216, 'https://studiodyanjong.com/assets/images/image01.gif?v=c3941204', 'https://studiodyanjong.com/'),//personal physical
+                    new Node("Transcend (2018)", -376, 247, 'https://studiodyanjong.com/assets/images/image20.gif?v=c3941204', 'https://studiodyanjong.com/'),//personal physical
+                    new Node("Resilience (2017)", -441, 250, 'https://studiodyanjong.com/assets/images/image11.jpg?v=c3941204', 'https://studiodyanjong.com/'),//personal physical
+
+                ];
+                this.nodeContainers = new Map();
+                this.graph = document.getElementById('graph');
+                this.mobileActiveNode = null;
+                this.isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                this.setupMobileClickOutside();
+                this.showNodes();
+            }
+
+ setupMobileClickOutside() {
+        // Reset mobile active node when clicking outside nodes
+        if (this.isMobile) {
+            this.graph.addEventListener('touchstart', (e) => {
+                // Only reset if clicking directly on the graph (not on a node container)
+                if (e.target === this.graph) {
+                    if (this.mobileActiveNode) {
+                        const prevContainer = this.nodeContainers.get(this.mobileActiveNode.name);
+                        if (prevContainer) {
+                            prevContainer.classList.remove('node-hover');
+                            const prevLabel = prevContainer.querySelector('.node-label');
+                            if (prevLabel) {
+                                prevLabel.style.opacity = 0;
+                            }
+                            this.mobileActiveNode.onLeave();
+                        }
+                        this.mobileActiveNode = null;
+                    }
+                }
+            });
+        }
+    }
+
+    setupGraph() {
+    }
+
+    addNode(node) {
+        this.nodes.push(node);
+    }
+
+    shakeNode(nodeElement, node) {
+        return; // REMOVE FOR MOVEMENT
+        if (node.isActive || this.isMobile) {
+            return;
+        }
+        node.xTrans = node.xTrans +  Math.random() * 5 - 2.5;
+        node.yTrans = node.yTrans + Math.random() * 5 -2.5;
+        nodeElement.style.transform = 'translate(' + node.xTrans + 'px, ' + node.yTrans + 'px)';
+            
+        setTimeout(() => {
+           
+            this.shakeNode(nodeElement, node);
+        },  300 + Math.random() * 500);
+    }
+
+    showNodes() {
+        const graphWidth = this.graph.clientWidth;
+        const graphHeight = this.graph.clientHeight;
+        
+        this.nodes.forEach(node => {
+            let containerElement;
+            let labelElement;
+            
+            if (this.nodeContainers.has(node.name)) {
+                containerElement = this.nodeContainers.get(node.name);
+                labelElement = containerElement.querySelector('.node-label');
+            } else {
+                // Create container div
+                containerElement = document.createElement('div');
+                containerElement.className = 'node-container';
+                containerElement.style.backgroundImage = `url(${node.imgUrl})`;
+                this.nodeContainers.set(node.name, containerElement);
+                
+                // Create label element
+                labelElement = document.createElement('div');
+                labelElement.className = 'node-label';
+                labelElement.innerHTML = '<span class="node-name">' + node.name + '<br <br>' + '<span class="view-more">— view —</span></span>';
+                
+                // Append label to container
+                containerElement.appendChild(labelElement);
+                
+                // Add hover event listeners (for desktop)
+                containerElement.addEventListener('mouseenter', () => {
+                    
+                    node.isActive = true;
+                    containerElement.classList.add('node-hover');
+                    containerElement.style.transition = "transform 0.3s ease";
+                    containerElement.style.transform = 'scale(1.7)';
+                    labelElement.style.opacity = 1;
+                    node.onHover();
+                });
+                
+                containerElement.addEventListener('mouseleave', () => {
+                    node.onLeave();
+                    node.isActive = false;
+                    containerElement.style.transition = "transform 1s ease";
+                    containerElement.style.transform = '';
+                    containerElement.classList.remove('node-hover');
+                    labelElement.style.opacity = 0;
+                    this.shakeNode(containerElement, node);
+                });
+                
+                // Add touch event listeners (for mobile hover)
+                if (this.isMobile) {
+                    containerElement.addEventListener('touchstart', (e) => {
+                        e.preventDefault(); // Prevent double-tap zoom
+                        e.stopPropagation(); // Prevent event from bubbling to graph
+                        // Reset previous active node
+                        if (this.mobileActiveNode && this.mobileActiveNode !== node) {
+                            const prevContainer = this.nodeContainers.get(this.mobileActiveNode.name);
+                            if (prevContainer) {
+                                prevContainer.classList.remove('node-hover');
+                                const prevLabel = prevContainer.querySelector('.node-label');
+                                if (prevLabel) {
+                                    prevLabel.style.opacity = 0;
+                                }
+                                this.mobileActiveNode.onLeave();
+                            }
+                        }
+                        // Activate hover for this node
+                        if (this.mobileActiveNode === node) {
+                            // Second tap - navigate
+                            node.onClick();
+                            // Reset hover state
+                            this.mobileActiveNode = null;
+                            containerElement.classList.remove('node-hover');
+                            labelElement.style.opacity = 0;
+                            node.onLeave();
+                        } else {
+                            // First tap - show hover
+                            this.mobileActiveNode = node;
+                            node.onHover();
+                            containerElement.classList.add('node-hover');
+                            labelElement.style.opacity = 1;
+                        }
+                    });
+                }
+                
+                // Add click handler (for desktop)
+                containerElement.addEventListener('click', () => {
+                    if (!this.isMobile) {
+                        node.onClick();
+                    }
+                });
+                
+                // Append container to graph
+                this.graph.appendChild(containerElement);
+            }
+            
+            // Position and size the container
+            containerElement.style.left = `${node.x + graphWidth / 2}px`;
+            containerElement.style.top = `${-node.y + graphHeight / 2}px`;
+            this.shakeNode(containerElement, node);
+            
+            if (node.width !== 0) {
+                containerElement.style.width = `${node.width}px`;
+            } else {
+                containerElement.style.width = 'auto';
+            }
+            
+            if (node.height !== 0) {
+                containerElement.style.height = `${node.height}px`;
+            } else {
+                containerElement.style.height = 'auto';
+            }
+            
+            // Update background image if it changed
+            if (containerElement.style.backgroundImage !== `url(${node.imgUrl})`) {
+                containerElement.style.backgroundImage = `url(${node.imgUrl})`;
+            }
+        });
+        
+    }
+    
+}
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const graph = new Graph();
+            graph.setupGraph();
+
+            function setScrollToHalfway() {
+                const graphContainer = document.getElementById('graph-container');
+                const graphEl = document.getElementById('graph');
+                
+                if (graphContainer && graphEl) {
+                    const scrollWidth = graphContainer.scrollWidth;
+                    const containerWidth = graphContainer.clientWidth;
+                    const halfwayPoint = (scrollWidth - containerWidth) / 2;
+                    
+                    graphContainer.scrollLeft = halfwayPoint;
+                }
+            }
+
+            setScrollToHalfway();
+
+            window.addEventListener('resize', () => {
+                setScrollToHalfway();
+                graph.showNodes();
+            });
+        });
+    </script>
+</body>
+</html>
+
