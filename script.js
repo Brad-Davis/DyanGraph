@@ -22,8 +22,19 @@ function setScrollToHalfway() {
 // Set scroll position on startup
 setScrollToHalfway();
 
-// Set scroll position on window resize
-window.addEventListener('resize', ()=> {
-    setScrollToHalfway();
-    graph.showNodes();
+// Set scroll position on window resize with debouncing for better performance
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        setScrollToHalfway();
+        graph.showNodes();
+    }, 100); // Debounce resize events
+});
+
+// Also recalculate on load to ensure proper sizing after images load
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        graph.showNodes();
+    }, 100);
 });

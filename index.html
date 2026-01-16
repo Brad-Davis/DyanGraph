@@ -18,14 +18,17 @@
         #graph {
             width: 100%;
             min-width: 1200px;
-            height: 100vh;
+            height: 100vh; /* Fallback for browsers that don't support dvh */
+            height: 100dvh; /* Use dynamic viewport height for better mobile support (overrides if supported) */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
         #graph-container, #overlays {
-            width: 100vw;
-            height: 100vh;
+            width: 100vw; /* Fallback for browsers that don't support dvw */
+            width: 100dvw; /* Use dynamic viewport width for better consistency (overrides if supported) */
+            height: 100vh; /* Fallback for browsers that don't support dvh */
+            height: 100dvh; /* Use dynamic viewport height for better mobile support (overrides if supported) */
             position: relative;
             overflow-x: scroll;
             scrollbar-width: none;
@@ -113,8 +116,10 @@
 
         #content {
             position: relative;
-            width: 100vw;
-            height: 100vh;
+            width: 100vw; /* Fallback for browsers that don't support dvw */
+            width: 100dvw; /* Use dynamic viewport width for better consistency (overrides if supported) */
+            height: 100vh; /* Fallback for browsers that don't support dvh */
+            height: 100dvh; /* Use dynamic viewport height for better mobile support (overrides if supported) */
         }
 
         .node-container {

@@ -67,8 +67,16 @@ class Graph {
     }
 
     showNodes() {
-        const graphWidth = this.graph.clientWidth;
-        const graphHeight = this.graph.clientHeight;
+        // Use getBoundingClientRect for more reliable measurements
+        const graphRect = this.graph.getBoundingClientRect();
+        const graphWidth = graphRect.width;
+        const graphHeight = graphRect.height;
+        
+        // Calculate a scale factor based on viewport width to make nodes responsive
+        // Base scale on 1920px width (common desktop size)
+        const baseWidth = 1920;
+        const viewportWidth = window.innerWidth;
+        const scaleFactor = Math.max(0.5, Math.min(1.5, viewportWidth / baseWidth));
         
         this.nodes.forEach(node => {
             let containerElement;
@@ -163,13 +171,13 @@ class Graph {
                 this.graph.appendChild(containerElement);
             }
             
-            // Position and size the container
-            containerElement.style.left = `${node.x + graphWidth / 2}px`;
-            containerElement.style.top = `${-node.y + graphHeight / 2}px`;
+            // Position and size the container with responsive scaling
+            containerElement.style.left = `${node.x * scaleFactor + graphWidth / 2}px`;
+            containerElement.style.top = `${-node.y * scaleFactor + graphHeight / 2}px`;
             this.shakeNode(containerElement, node);
             
             if (node.width !== 0) {
-                containerElement.style.width = `${node.width}px`;
+                containerElement.style.width = `${node.width * scaleFactor}px`;
                 nodeElement.style.width = '100%';
             } else {
                 containerElement.style.width = 'auto';
@@ -177,7 +185,7 @@ class Graph {
             }
             
             if (node.height !== 0) {
-                containerElement.style.height = `${node.height}px`;
+                containerElement.style.height = `${node.height * scaleFactor}px`;
                 nodeElement.style.height = '100%';
             } else {
                 containerElement.style.height = 'auto';
