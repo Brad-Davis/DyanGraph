@@ -6,7 +6,10 @@
     <title>Basic HTML Setup (Inline)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://images.squarespace-cdn.com" crossorigin>
+    <link rel="preload" as="image" href="https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/7c339ef2-25d4-4ba5-b0d3-40850376f4fa/graphV5.jpg?content-type=image%2Fjpeg" fetchpriority="high">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
     <style>
         body {
             margin: 0;
@@ -173,6 +176,27 @@
             transform: scale(1);
         }
         
+        .node-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+        }
+        
+        .node-container img.loaded {
+            opacity: 1;
+        }
+        
+        #graph {
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+        
+        #graph.loaded {
+            opacity: 1;
+        }
+        
         .node-container.node-hover {
             transform: scale(1.7);
             z-index: 10;
@@ -215,12 +239,51 @@
                 font-size: 5px;
             }
         }
+
+        /* Loading Spinner */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+
+        #loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
     <div id="content">
         <div id="graph-container">
-            <div id="graph" style="background-image: url('https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/7c339ef2-25d4-4ba5-b0d3-40850376f4fa/graphV5.jpg?content-type=image%2Fjpeg');">
+            <div id="graph" data-bg-image="https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/7c339ef2-25d4-4ba5-b0d3-40850376f4fa/graphV5.jpg?content-type=image%2Fjpeg">
             </div>
         </div>
         <div id="overlays">
@@ -269,6 +332,9 @@
                 
                 // Store base height for y-axis calculations to maintain constant spread regardless of zoom
                 this.baseHeight = null;
+                
+                // Set up Intersection Observer for lazy loading
+                this.setupLazyLoading();
 
                 this.nodes = [
                     // Existing nodes with actual image URLs
@@ -298,8 +364,8 @@
                     new Node('Joe Hisaishi | Ashitaka and San', 118, 2, 162.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1638760600542-0P71BLY7QIJBKYWWUKRX/Screen+Shot+2021-09-09+at+12.52.06+AM.png?format=1500w', 'https://dyanjong.com/#/joe-hisaishi-ashitaka-and-san/'), // commisioned physical/digital
                     new Node('JACOB COLLIER | DJESSE 3', 153, 252, 100, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1573414303386-Q2QQCB8E11XYME4YBGEW/JacobCollier_DJESSE3.jpg?format=1500w', 'https://dyanjong.com/#/jacob-collier-djesse-3/'), // physical commisioned
                     new Node('MIYAVI | HOLY NIGHTS', 98, 103, 112.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1586066649609-ZYJVZ9GVXW4R2SNRBP5M/MIYAVI_HolyNights_LIMITED-A-Cover_M1.jpg?format=1500w', 'https://dyanjong.com/#/miyavi-holy-nights/'), // commisioned physical/digital
-                    new Node('Emily Mei | Intro to Mei', 339, -200, 101.25, 75, 'https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/4681150a-888f-4d24-90ce-8051b54f6f34/Emily+Mei+Intro+1.jpg?content-type=image%2Fjpeg', 'https://dyanjong.com/emily-mei'), // commisioned digital deep 
-                    new Node('AMAZON MUSIC JP | MIYAVI VIRTUAL 5.0: SYNTHESIS', 226, -150, 162.5, 83.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/8c9f0629-a428-46f2-ba35-c1421da481ae/EqUqUfzUwAAxmPC.jpeg?format=1500w', 'https://dyanjong.com/#/amazon-music-jp-miyavi-virtual-50-synthesis/'), // deep commisioned digital
+                    new Node('Emily Mei | Intro to Mei', 469, -230, 101.25, 75, 'https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/4681150a-888f-4d24-90ce-8051b54f6f34/Emily+Mei+Intro+1.jpg?content-type=image%2Fjpeg', 'https://dyanjong.com/emily-mei'), // commisioned digital deep 
+                    new Node('AMAZON MUSIC JP | MIYAVI VIRTUAL 5.0: SYNTHESIS', 206, -80, 162.5, 83.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/8c9f0629-a428-46f2-ba35-c1421da481ae/EqUqUfzUwAAxmPC.jpeg?format=1500w', 'https://dyanjong.com/#/amazon-music-jp-miyavi-virtual-50-synthesis/'), // deep commisioned digital
                     new Node('Hollis | Sedative Live', -93, -81, 112.5, 56.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1589329705878-JDOYVKYMWGXTP0PKGYTN/892199038_1080.jpg?format=1500w', 'https://dyanjong.com/#/hollis-sedative-live/'), // lightly commisioned physical/digital more digtal
                     new Node('Berhana | Golden Medley', 69, -147, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/225b1533-dff9-459e-9dbb-e67859bb9470/400179569.jpg?format=1500w', 'https://dyanjong.com/#/berhana-golden-medley/'), // commisioned digital
                     new Node('Berhana | Lucky Strike', 21, -200, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/db10c970-977b-4b66-8c4d-65a60b4077ad/400177624.jpg?format=1500w', 'https://dyanjong.com/#/berhana-lucky-strike/'), // commisioned digital
@@ -325,10 +391,10 @@
                     // new Node('Cyanotypes', -537, 196, 86.25, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1706141763759-0KH47QYMU06YYX1CJGF9/Dimples_alstroemeria_blue.jpg', 'https://dyanjong.com/cyanotypes/'), // personal physical
                     new Node('Cinespace 2020 | Baobei', -344, -200, 172.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1595052297041-VDOJ734PVI9RRFZ6AF1V/image-asset.jpeg', 'https://dyanjong.com/cinespace-2020-baobei/'), //personal digital
                     new Node('ALBUMTONES', -409, -183, 100, 120, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/0974d602-851f-49ac-a079-ba4d5aa280e7/Screenshot+2025-12-01+at+9.12.32%E2%80%AFPM.png', 'https://dyanjong.com/albumtones/'), // personal digital
-                    new Node('EDEN MCMXCV', 240, -150, 100, 180, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1508363624769-7Q6FWKKX78TRZGAABF52/E_2027.jpg?format=1000w', 'https://dyanjong.com/#/eden-mcmxcv/'), // DIGITAL COMMISSIONED
+                    new Node('EDEN MCMXCV', 130, -150, 100, 180, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1508363624769-7Q6FWKKX78TRZGAABF52/E_2027.jpg?format=1000w', 'https://dyanjong.com/#/eden-mcmxcv/'), // DIGITAL COMMISSIONED
                     new Node('Deux Hommes | Dysmorphia', -20, -120, 100, 180, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1455309466428-YYA5ENIXE55QXY8BT017/AshtonMichael_Justin_slice_floorless.gif?format=1000w', 'https://dyanjong.com/#/deux-hommes-dysmorphia/'), // DIGITAL PERSONAL (close to axis)
                     new Node('The 1975 at the Palladium', -90, -170, 100, 160, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1765134673321-P8IPT7GAXIDS6TNLAPFJ/1975-5192.jpg?format=1000w', 'https://dyanjong.com/#/the-1975-at-the-palladium/'), // DIGITAL PERSONAL (close to axis)
-                    new Node('Photogenics Mag | ALTERED STATE', 350, -120, 120, 160, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1550265313473-FWT1S8ZQRO3MUACFR3LH/Svetlana_mirror.gif?format=1000w', 'https://dyanjong.com/#/photogenics-altered-state/'), // DIGITAL COMMISSIONED
+                    new Node('Photogenics Mag | ALTERED STATE', 250, -120, 120, 160, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1550265313473-FWT1S8ZQRO3MUACFR3LH/Svetlana_mirror.gif?format=1000w', 'https://dyanjong.com/#/photogenics-altered-state/'), // DIGITAL COMMISSIONED
                     new Node('LA Canvas | Jarell Perry', 55, -130, 100, 180, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/5ce1cf31-75cf-463d-b0de-abe0d318958e/Jarell_5073_crop.jpg?format=1000w', 'https://dyanjong.com/#/la-canvas-jarell-perry/'), // DIGITAL PERSONAL (close to axis)
                     new Node('The Laterals | Yuna', 320, -140, 150, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1508369424259-0TBSVFKYK93JDVAD6P01/YUNA_stairs.gif?format=1000w', 'https://dyanjong.com/#/the-laterals-yuna/'), // DIGITAL COMMISSIONED
                     new Node('W Magazine | Rachel Keller', 340, -110, 100, 180, "https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1513831282889-KF255HNUGOOHQOYWTKXJ/IMG_2473.JPG?format=1000w", "https://dyanjong.com/#/w-rachel-keller/"), // DIGITAL COMMISSIONED
@@ -354,8 +420,98 @@
                 this.mobileActiveNode = null;
                 this.isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
                 this.setupMobileClickOutside();
+                this.loadGraphBackground();
                 this.showNodes();
+                this.checkInitialLoad();
             }
+
+    setupLazyLoading() {
+        // Create Intersection Observer for lazy loading background images
+        const options = {
+            root: null,
+            rootMargin: '50px', // Start loading 50px before element enters viewport
+            threshold: 0.01
+        };
+
+        this.imageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const element = entry.target;
+                    const imageUrl = element.dataset.bgImage || element.dataset.imgUrl;
+                    
+                    if (imageUrl && !element.classList.contains('image-loaded')) {
+                        // Mark as loading to prevent duplicate loads
+                        element.classList.add('image-loaded');
+                        
+                        // Load the image
+                        const img = new Image();
+                        img.onload = () => {
+                            // Set background image and fade in
+                            element.style.backgroundImage = `url(${imageUrl})`;
+                            element.classList.add('loaded');
+                            // Unobserve after loading
+                            this.imageObserver.unobserve(element);
+                        };
+                        img.onerror = () => {
+                            // Still mark as loaded even if error
+                            element.classList.add('loaded');
+                            this.imageObserver.unobserve(element);
+                        };
+                        img.src = imageUrl;
+                    }
+                }
+            });
+        }, options);
+    }
+
+    loadGraphBackground() {
+        const graphElement = document.getElementById('graph');
+        if (graphElement && graphElement.dataset.bgImage) {
+            const imageUrl = graphElement.dataset.bgImage;
+            
+            // Load immediately (not lazy) since this is the LCP element
+            const img = new Image();
+            img.fetchPriority = 'high'; // High priority for LCP
+            img.onload = () => {
+                // Set background image and fade in
+                graphElement.style.backgroundImage = `url(${imageUrl})`;
+                graphElement.classList.add('loaded');
+                this.hideLoadingOverlay();
+            };
+            img.onerror = () => {
+                // Still mark as loaded even if error
+                graphElement.classList.add('loaded');
+                this.hideLoadingOverlay();
+            };
+            img.src = imageUrl;
+        }
+    }
+
+    hideLoadingOverlay() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+            // Wait a brief moment to ensure nodes are starting to render
+            setTimeout(() => {
+                loadingOverlay.classList.add('hidden');
+                // Remove from DOM after fade-out animation completes
+                setTimeout(() => {
+                    if (loadingOverlay.parentNode) {
+                        loadingOverlay.parentNode.removeChild(loadingOverlay);
+                    }
+                }, 500);
+            }, 300);
+        }
+    }
+
+    checkInitialLoad() {
+        // Fallback: Hide loading overlay after max wait time if not already hidden
+        setTimeout(() => {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay && !loadingOverlay.classList.contains('hidden')) {
+                this.hideLoadingOverlay();
+            }
+        }, 3000); // Max 3 seconds wait time
+    }
 
  setupMobileClickOutside() {
         // Reset mobile active node when clicking outside nodes
@@ -508,8 +664,11 @@
                 // Create container div
                 containerElement = document.createElement('div');
                 containerElement.className = 'node-container';
-                containerElement.style.backgroundImage = `url(${node.imgUrl})`;
+                containerElement.dataset.imgUrl = node.imgUrl; // Store image URL for lazy loading
                 this.nodeContainers.set(node.name, containerElement);
+                
+                // Set up lazy loading for this container
+                this.imageObserver.observe(containerElement);
                 
                 // Create label element
                 labelElement = document.createElement('div');
@@ -676,9 +835,19 @@
                 }
             }
             
-            // Update background image if it changed
-            if (containerElement.style.backgroundImage !== `url(${node.imgUrl})`) {
-                containerElement.style.backgroundImage = `url(${node.imgUrl})`;
+            // Update image URL data attribute if it changed (for lazy loading)
+            if (containerElement.dataset.imgUrl !== node.imgUrl) {
+                containerElement.dataset.imgUrl = node.imgUrl;
+                // If not already loaded, observe for lazy loading
+                if (!containerElement.classList.contains('image-loaded')) {
+                    this.imageObserver.observe(containerElement);
+                } else if (containerElement.style.backgroundImage !== `url(${node.imgUrl})`) {
+                    // If already loaded but URL changed, update immediately
+                    containerElement.style.backgroundImage = `url(${node.imgUrl})`;
+                }
+            } else if (containerElement.style.backgroundImage && !containerElement.classList.contains('image-loaded')) {
+                // If image is already set but not marked as loaded, mark it
+                containerElement.classList.add('image-loaded', 'loaded');
             }
             
             // For existing nodes (on resize), ensure they're visible but don't re-animate
