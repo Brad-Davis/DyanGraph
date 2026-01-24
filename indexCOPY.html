@@ -220,6 +220,9 @@
             text-align: center;
             font-size: 7px;
             display: flex;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
         }
 
         .node-name {
@@ -233,10 +236,49 @@
         @media (max-width: 768px) {
             .node-container.node-hover {
                 transform: scale(5) !important;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
 
             .node-label {
-                font-size: 5px;
+                font-size: 4px;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                text-rendering: optimizeLegibility;
+                transform: translateZ(0); /* Force hardware acceleration for smoother rendering */
+                backface-visibility: hidden;
+            }
+            
+            /* When container scales 5x, increase font-size and scale only the text content */
+            /* Background stays at full size, only text is scaled to prevent pixelation */
+            .node-container.node-hover .node-label {
+                font-size: 20px;
+            }
+            
+            /* Scale only the text content (not the background) to counteract container scale */
+            /* Use 400% width so when scaled to 0.2, it equals 80% of the container (with spacing on sides) */
+            .node-container.node-hover .node-label {
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .node-container.node-hover .node-label .node-name {
+                width: 400%;
+                max-width: none;
+                transform: translateZ(0) scale(0.2);
+                transform-origin: center center;
+                will-change: transform;
+                text-align: center;
+                margin: 0;
+                flex-shrink: 0;
+            }
+            
+            .node-container.node-hover .node-label .view-more {
+                font-size: 15px;
+            }
+            
+            .node-label .view-more {
+                font-size: 3px;
             }
         }
 
@@ -318,7 +360,23 @@
             }
 
             onClick() {
-                window.location.href = this.linkUrl;
+                try {
+                    const currentUrl = new URL(window.location.href);
+                    const targetUrl = new URL(this.linkUrl);
+                    
+                    // Check if it's the same domain and has a hash route
+                    if (currentUrl.hostname === targetUrl.hostname && targetUrl.hash) {
+                        // For hash-based routing on the same domain, use the hash directly
+                        // This triggers the router properly
+                        window.location.hash = targetUrl.hash;
+                    } else {
+                        // For different domains or non-hash routes, do full navigation
+                        window.location.href = this.linkUrl;
+                    }
+                } catch (e) {
+                    // Fallback to original behavior if URL parsing fails
+                    window.location.href = this.linkUrl;
+                }
             }
         }
 
@@ -338,69 +396,69 @@
 
                 this.nodes = [
                     // Existing nodes with actual image URLs
-                    new Node('The Hollywood Reporter | Kelly Marie Tran', 180, -129, 88.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1614835547641-1I222O3CDK7T28KLXANK/THR-Cover-Issue-9-9cover.hires-2021-1614729091-compressed.jpg?format=1500w', 'https://dyanjong.com/#/the-hollywood-reporter-kelly-marie-tran/'), // DIGITAL COMMISIONED
-                    new Node("TM Camera Roll", 300, 310, 172.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/a9a2b3d0-2248-44e0-a4bf-6cf1f647523d/11690002_edit.jpg?format=1500w', 'https://dyanjong.com/#/tm-camera-roll/'), // PHYSICAL COMMISSIONED
-                    new Node('Chromic Duo | Room of Oceans', -76, 3, 75, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/089ab958-e587-4e15-9b64-54afbbf740c7/CD_Final_Flat_Highest-Res_RGB_10x10_M1.jpg?format=2500w', 'https://dyanjong.com/#/chromic-duo-room-of-oceans/'), // CENTER ZONE
-                    new Node('Hulu | Hellraiser', 486, -71, 88.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/f98e5254-17a0-48b7-bc4c-b6f202dde7ff/IMG_1935.jpg?format=2500w', 'https://dyanjong.com/#/hellraiser/'), // COMMISSIONED DIGITAL
-                    new Node('decades (in space)', -30, 239, 120, 120, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/6d164d42-9d92-4b61-9f09-59e369f335eb/Decades_20231003_0001_A_black_edit+%282%29+copy.jpg?format=2500w', 'https://dyanjong.com/#/decades-in-space/'), // PERSONAL/COMMISIONED PHYSICAL
-                    new Node('NBA All Star Week - LukAI', 200, -204, 187.5, 76.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/4e09de52-05bb-4dd9-bd66-2c0627ad5f56/Screenshot%2B2023-05-04%2Bat%2B14.39.17.png?format=1500w', 'https://dyanjong.com/#/nba-all-star-week-lukai/'), // DIGITAL COMMISED
-                    new Node('T-Mobile - Channel Chillwave', 48, -50, 150, 86.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1760206670378-WMC8N99SRNNHIWQFVH9Q/Sequence+03.00_13_35_01.Still101.jpg?format=750w', 'https://dyanjong.com/#/tmobile-channel-chillwave/'), // DIGITAL/ SLIGTHLY PHYSICAL COMMISIONED
-                    new Node('T-Mobile - Wish You Were Here', 251, 10, 150, 101.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1740680235087-AGFJC2J23OG56N6GR1Y0/394A9407_edit.jpg?format=750w', 'https://dyanjong.com/#/tmobile-wish-you-were-here/'), //  PHYSICAL/DIGITAL COMMISIONED
-                    // new Node('Reclaim The Flag Set Portraits', 241, -60, 120, 70.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/e449cfa5-70a2-425e-885f-a8003bc10e67/GeorgeTakei.jpg?format=750w', 'https://dyanjong.com/#/reclaim-the-flag-set-portraits/'), // COMMISIONED PYYSICAL/DIGITAL
-                    new Node('Rei Brown', -408, -50, 112.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/faeadc19-9c20-4710-9c9d-93926011ad5f/ReiBrown2-snapshot-2025-09-02_19-24-20.png?format=500w', 'https://dyanjong.com/#/rei-brown/'), // PYHSYICAL/DIGITAL PERSONAL
-                    new Node('Woosung', -401, 70, 93.75, 123.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1679960163520-M7WN41I4ADXW4VXMUF1C/02+-+WO_1280.jpg?format=1500w', 'https://dyanjong.com/#/woosung/'), // PERSONAL PHYSICAL MAINLY DIGITAL
-                    new Node('The Rose | HEAL', 259, 270, 93.75, 93.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1669100821234-T08793ZZD7UPO27EXTP2/TheROSE_Booklet_FOREST_M1.jpg?format=1500w', 'https://dyanjong.com/#/the-rose-heal/'), // commisioned physical
-                    new Node('LA Times | LA Dance Project', 374, 14, 182.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/6b3eb6b2-c9f2-49fc-ba8e-d0fcc91e003a/DSC08410.jpg?format=1500w', 'https://dyanjong.com/#/la-times-la-dance-project/'), // commisioned physical/digital
-                    new Node('Dolly Ave | This Is Our Time', -43, -80, 112.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/591e60ec-e28e-4562-a8b6-8f60a37e30eb/DA-Back-Final.jpg?format=750w', 'https://dyanjong.com/#/dolly-ave-this-is-our-time/'), // commisined/ a lil personal - digital
-                    new Node('TAAF | Heritage Heroes', 421, 148, 182.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/16be9f89-41c0-4818-ae02-babd5c6b54b3/644c2d5acf851170b320f17f_HeritageHeroes-Ming-NaWen-8.jpg?format=1500w', 'https://dyanjong.com/#/taaf-heritage-heroes/'), // commisioned slightly more physical
-                    new Node('Japanese Breakfast | Paprika [Live]', 197, 182, 182.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1653618850223-KZXU9SMSOOUOYGO0FFE4/JB.00_00_53_19.Still250.jpg?format=1500w', 'https://dyanjong.com/#/japanese-breakfast-paprika-live/'), // commisioned slightly more physical
-                    new Node('MC Jin | Stop The Hatred [Live]', 306, 154, 182.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1653619755358-FQ8PMXWHM1N5HIM9RZY7/MCJ.00_02_00_02.Still110.jpg?format=1500w', 'https://dyanjong.com/#/mc-jin-stop-the-hatred-live/'), // commisioned slightly more physical
-                    new Node('FLAUNT | Mark Tuan', 70, 244, 130, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1653619222543-U4ULRS9VA84TFXT7XUMI/Ver+4+Copy+01.00_05_17_06.Still045.jpg?format=1500w', 'https://dyanjong.com/#/flaunt-mark-tuan/'), // commisioned slightly more personal physical
-                    new Node('FLAUNT | Lana Condor', -30, 121, 140, 140, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1649095191188-04Q8N16YRRD8SHL651S2/LANA+FINAL+EDIT+Copy+01.00_00_14_22.Still002.jpg?format=1500w', 'https://dyanjong.com/#/flaunt-lana-condor/'), // commisioned slightly more personal physical
-                    new Node('Sunrise Canyon', -187, -130, 182.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1644015761718-STV8K2JF6VPMHZOVSOW3/main_2_cycles.png?format=1500w', 'https://dyanjong.com/#/sunrise-canyon/'), // personal/commisioned right on the axis Digital
-                    new Node('Woosung | GENRE', 195, 81, 112.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1638748907230-MX56HESBNXS75JNB6R0J/Woosung_Genre_10x10_300dpi_RGB_M1.jpg?format=1500w', 'https://dyanjong.com/#/woosung-genre/'), // Commissioned slighlty more physical/digital
-                    new Node('Dolly Ave | Press Photos', -60, 44, 112.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1646853022122-114VY8FK7ZMG2YWIJHPK/DSC01385-edit.jpg?format=1500w', 'https://dyanjong.com/#/dolly-ave-press-photos/'), // 
-                    new Node('KLTKN x MIYAVI | Hush Hush ft. Kang Daniel', 322, -132, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1653621632640-EC2YNGO5FTJSBCY70FS9/Sequence+01.00_01_06_04.Still059.jpg?format=1500w', 'https://dyanjong.com/#/kltkn-x-miyavi-hush-hush-ft-kang-daniel/'), // commisioned digital very deep
-                    new Node('Joe Hisaishi | Ashitaka and San', 118, 2, 162.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1638760600542-0P71BLY7QIJBKYWWUKRX/Screen+Shot+2021-09-09+at+12.52.06+AM.png?format=1500w', 'https://dyanjong.com/#/joe-hisaishi-ashitaka-and-san/'), // commisioned physical/digital
-                    new Node('JACOB COLLIER | DJESSE 3', 153, 252, 100, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1573414303386-Q2QQCB8E11XYME4YBGEW/JacobCollier_DJESSE3.jpg?format=1500w', 'https://dyanjong.com/#/jacob-collier-djesse-3/'), // physical commisioned
-                    new Node('MIYAVI | HOLY NIGHTS', 98, 103, 112.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1586066649609-ZYJVZ9GVXW4R2SNRBP5M/MIYAVI_HolyNights_LIMITED-A-Cover_M1.jpg?format=1500w', 'https://dyanjong.com/#/miyavi-holy-nights/'), // commisioned physical/digital
+                    new Node('The Hollywood Reporter | Kelly Marie Tran', 180, -129, 88.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1614835547641-1I222O3CDK7T28KLXANK/THR-Cover-Issue-9-9cover.hires-2021-1614729091-compressed.jpg?format=1500w', 'https://dyanjong.com/the-hollywood-reporter-kelly-marie-tran/'), // DIGITAL COMMISIONED
+                    new Node("TM Camera Roll", 320, 290, 152.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/a9a2b3d0-2248-44e0-a4bf-6cf1f647523d/11690002_edit.jpg?format=1500w', 'https://dyanjong.com/tm-camera-roll/'), // PHYSICAL COMMISSIONED
+                    new Node('Chromic Duo | Room of Oceans', -76, 3, 75, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/089ab958-e587-4e15-9b64-54afbbf740c7/CD_Final_Flat_Highest-Res_RGB_10x10_M1.jpg?format=2500w', 'https://dyanjong.com/chromic-duo-room-of-oceans/'), // CENTER ZONE
+                    new Node('Hulu | Hellraiser', 486, -71, 88.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/f98e5254-17a0-48b7-bc4c-b6f202dde7ff/IMG_1935.jpg?format=2500w', 'https://dyanjong.com/hellraiser/'), // COMMISSIONED DIGITAL
+                    new Node('decades (in space)', -30, 239, 120, 120, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/6d164d42-9d92-4b61-9f09-59e369f335eb/Decades_20231003_0001_A_black_edit+%282%29+copy.jpg?format=2500w', 'https://dyanjong.com/decades-in-space/'), // PERSONAL/COMMISIONED PHYSICAL
+                    new Node('NBA All Star Week - LukAI', 200, -204, 187.5, 76.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/4e09de52-05bb-4dd9-bd66-2c0627ad5f56/Screenshot%2B2023-05-04%2Bat%2B14.39.17.png?format=1500w', 'https://dyanjong.com/nba-all-star-week-lukai/'), // DIGITAL COMMISED
+                    new Node('T-Mobile - Channel Chillwave', 48, -50, 150, 86.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1760206670378-WMC8N99SRNNHIWQFVH9Q/Sequence+03.00_13_35_01.Still101.jpg?format=750w', 'https://dyanjong.com/tmobile-channel-chillwave/'), // DIGITAL/ SLIGTHLY PHYSICAL COMMISIONED
+                    new Node('T-Mobile - Wish You Were Here', 251, 10, 150, 101.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1740680235087-AGFJC2J23OG56N6GR1Y0/394A9407_edit.jpg?format=750w', 'https://dyanjong.com/tmobile-wish-you-were-here/'), //  PHYSICAL/DIGITAL COMMISIONED
+                    // new Node('Reclaim The Flag Set Portraits', 241, -60, 120, 70.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/e449cfa5-70a2-425e-885f-a8003bc10e67/GeorgeTakei.jpg?format=750w', 'https://dyanjong.com/reclaim-the-flag-set-portraits/'), // COMMISIONED PYYSICAL/DIGITAL
+                    new Node('Rei Brown', -408, -50, 112.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/faeadc19-9c20-4710-9c9d-93926011ad5f/ReiBrown2-snapshot-2025-09-02_19-24-20.png?format=500w', 'https://dyanjong.com/rei-brown/'), // PYHSYICAL/DIGITAL PERSONAL
+                    new Node('Woosung', -341, 70, 93.75, 123.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1679960163520-M7WN41I4ADXW4VXMUF1C/02+-+WO_1280.jpg?format=1500w', 'https://dyanjong.com/woosung/'), // PERSONAL PHYSICAL MAINLY DIGITAL
+                    new Node('The Rose | HEAL', 259, 270, 93.75, 93.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1669100821234-T08793ZZD7UPO27EXTP2/TheROSE_Booklet_FOREST_M1.jpg?format=1500w', 'https://dyanjong.com/the-rose-heal/'), // commisioned physical
+                    new Node('LA Times | LA Dance Project', 374, 14, 182.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/6b3eb6b2-c9f2-49fc-ba8e-d0fcc91e003a/DSC08410.jpg?format=1500w', 'https://dyanjong.com/la-times-la-dance-project/'), // commisioned physical/digital
+                    new Node('Dolly Ave | This Is Our Time', -43, -80, 112.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/591e60ec-e28e-4562-a8b6-8f60a37e30eb/DA-Back-Final.jpg?format=750w', 'https://dyanjong.com/dolly-ave-this-is-our-time/'), // commisined/ a lil personal - digital
+                    new Node('TAAF | Heritage Heroes', 421, 148, 182.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/16be9f89-41c0-4818-ae02-babd5c6b54b3/644c2d5acf851170b320f17f_HeritageHeroes-Ming-NaWen-8.jpg?format=1500w', 'https://dyanjong.com/taaf-heritage-heroes/'), // commisioned slightly more physical
+                    new Node('Japanese Breakfast | Paprika [Live]', 197, 182, 182.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1653618850223-KZXU9SMSOOUOYGO0FFE4/JB.00_00_53_19.Still250.jpg?format=1500w', 'https://dyanjong.com/japanese-breakfast-paprika-live/'), // commisioned slightly more physical
+                    new Node('MC Jin | Stop The Hatred [Live]', 306, 124, 182.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1653619755358-FQ8PMXWHM1N5HIM9RZY7/MCJ.00_02_00_02.Still110.jpg?format=1500w', 'https://dyanjong.com/mc-jin-stop-the-hatred-live/'), // commisioned slightly more physical
+                    new Node('FLAUNT | Mark Tuan', 70, 244, 130, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1653619222543-U4ULRS9VA84TFXT7XUMI/Ver+4+Copy+01.00_05_17_06.Still045.jpg?format=1500w', 'https://dyanjong.com/flaunt-mark-tuan/'), // commisioned slightly more personal physical
+                    new Node('FLAUNT | Lana Condor', -30, 121, 140, 140, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1649095191188-04Q8N16YRRD8SHL651S2/LANA+FINAL+EDIT+Copy+01.00_00_14_22.Still002.jpg?format=1500w', 'https://dyanjong.com/flaunt-lana-condor/'), // commisioned slightly more personal physical
+                    new Node('Sunrise Canyon', -187, -130, 182.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1644015761718-STV8K2JF6VPMHZOVSOW3/main_2_cycles.png?format=1500w', 'https://dyanjong.com/sunrise-canyon/'), // personal/commisioned right on the axis Digital
+                    new Node('Woosung | GENRE', 195, 81, 112.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1638748907230-MX56HESBNXS75JNB6R0J/Woosung_Genre_10x10_300dpi_RGB_M1.jpg?format=1500w', 'https://dyanjong.com/woosung-genre/'), // Commissioned slighlty more physical/digital
+                    new Node('Dolly Ave | Press Photos', -60, 44, 112.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1646853022122-114VY8FK7ZMG2YWIJHPK/DSC01385-edit.jpg?format=1500w', 'https://dyanjong.com/commissioned#/dolly-ave/'), // 
+                    new Node('KLTKN x MIYAVI | Hush Hush ft. Kang Daniel', 322, -132, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1653621632640-EC2YNGO5FTJSBCY70FS9/Sequence+01.00_01_06_04.Still059.jpg?format=1500w', 'https://dyanjong.com/kltkn-x-miyavi-hush-hush-ft-kang-daniel/'), // commisioned digital very deep
+                    new Node('Joe Hisaishi | Ashitaka and San', 118, 2, 162.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1638760600542-0P71BLY7QIJBKYWWUKRX/Screen+Shot+2021-09-09+at+12.52.06+AM.png?format=1500w', 'https://dyanjong.com/joe-hisaishi-ashitaka-and-san/'), // commisioned physical/digital
+                    new Node('JACOB COLLIER | DJESSE 3', 153, 252, 100, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1573414303386-Q2QQCB8E11XYME4YBGEW/JacobCollier_DJESSE3.jpg?format=1500w', 'https://dyanjong.com/jacob-collier-djesse-3/'), // physical commisioned
+                    new Node('MIYAVI | HOLY NIGHTS', 98, 103, 112.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1586066649609-ZYJVZ9GVXW4R2SNRBP5M/MIYAVI_HolyNights_LIMITED-A-Cover_M1.jpg?format=1500w', 'https://dyanjong.com/miyavi-holy-nights/'), // commisioned physical/digital
                     new Node('Emily Mei | Intro to Mei', 469, -230, 101.25, 75, 'https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/4681150a-888f-4d24-90ce-8051b54f6f34/Emily+Mei+Intro+1.jpg?content-type=image%2Fjpeg', 'https://dyanjong.com/emily-mei'), // commisioned digital deep 
-                    new Node('AMAZON MUSIC JP | MIYAVI VIRTUAL 5.0: SYNTHESIS', 206, -80, 162.5, 83.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/8c9f0629-a428-46f2-ba35-c1421da481ae/EqUqUfzUwAAxmPC.jpeg?format=1500w', 'https://dyanjong.com/#/amazon-music-jp-miyavi-virtual-50-synthesis/'), // deep commisioned digital
-                    new Node('Hollis | Sedative Live', -93, -81, 112.5, 56.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1589329705878-JDOYVKYMWGXTP0PKGYTN/892199038_1080.jpg?format=1500w', 'https://dyanjong.com/#/hollis-sedative-live/'), // lightly commisioned physical/digital more digtal
-                    new Node('Berhana | Golden Medley', 69, -147, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/225b1533-dff9-459e-9dbb-e67859bb9470/400179569.jpg?format=1500w', 'https://dyanjong.com/#/berhana-golden-medley/'), // commisioned digital
-                    new Node('Berhana | Lucky Strike', 21, -200, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/db10c970-977b-4b66-8c4d-65a60b4077ad/400177624.jpg?format=1500w', 'https://dyanjong.com/#/berhana-lucky-strike/'), // commisioned digital
-                    new Node('Netflix | Emmys Party Motion Studio', 354, 204, 150, 86.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/c245daf6-bf03-44ba-b0a3-d145c1341ad9/A004C004_190922FQ.01521372.MOV.17_36_48_09.STILL003.jpg?format=1500w', 'https://dyanjong.com/#/netflix-emmys-party-motion-studio/'), // commisioned physical
-                    new Node('Netflix | Stranger Things S3 Lookbook', 470, 250, 112.5, 86.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/cc68fa85-7738-482a-aff2-96a561cc70b0/Netflix_ST3_thumb.jpg?format=1500w', 'https://dyanjong.com/#/netflix-stranger-things-s3-lookbook/'), // commsioned physical
-                    new Node('Jessica Universe | Always', -137, 201, 101.25, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1579069136935-XCLIGJNZAP37EJXFUGI8/JU_Always.jpg?format=1500w', 'https://dyanjong.com/#/jessica-universe-always/'), // commisioned/personal physical
-                    new Node('FLAUNT | Poppy', -100, 96, 86.25, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1571599394547-Q6IRR8RNJS6VM6BSMG8I/167%2Bflaunt%2Bmagazine%2Bpoppy%2Bdigital%2Bv2.jpg?format=1500w', 'https://dyanjong.com/#/flaunt-poppy/'), // commisioned/personal physical/digital
-                    new Node('Kali Uchis | Dead to Me (Acoustic)', 36, 148, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1535330607257-MDGIVG2CO5458W8DJ4XY/Kali_cover.jpg?format=1500w', 'https://dyanjong.com/#/kali-uchis-dead-to-me-acoustic/'), // commisioned physical/digital
-                    new Node('QUIÑ | MATH (Director\'s Cut)', -186, 17, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/1d335660-11dd-444d-8559-909a0343334e/Quin+Math+%281%29.jpg?content-type=image%2Fjpeg', 'https://dyanjong.com/#/quin-math-directors-cut/'), // commisioned/personal physical/digital
-                    new Node('QUIÑ | Galacticat', -218, -7, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/852d899c-66b4-4917-8c6b-2e00496ad7aa/Galacticat+%281%29.jpg?content-type=image%2Fjpeg', 'https://dyanjong.com/#/quin-galacticat/'), // commisioned/personal physical/digital
-                    new Node('The Laterals | MIYAVI', -296, -24, 112.5, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1578025554776-DAG5FTK7X99YMHCN32YK/DSC09110.jpg?format=1500w', 'https://dyanjong.com/#/the-laterals-miyavi/'), // commisoned/personal more physical/digital
-                    new Node('BILLIE EILISH', -92, 242, 112.5, 71.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1540833062786-K9UMG56A7F5FBUOGABJX/Billie_light3.gif?format=1500w', 'https://dyanjong.com/#/billie-eilish/'), // personal/closer to commisioned physical
-                    new Node('The Laterals | Eve Hewson', -169, -42, 112.5, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1543086341795-OYNIDB26AW4EQEFVW0YW/DSC09852.jpg?format=1500w', 'https://dyanjong.com/#/the-laterals-eve-hewson/'), // commisioned/personal physical/close digital
-                    new Node('Character Media | Ian Alexander', 385, -200, 80, 110, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/4613476b-9bfb-48b1-a38f-70f21a485216/IA_08021s.jpg?format=1500w', 'https://dyanjong.com/#/character-media-ian-alexander/'), //digital commisioned
-                    new Node('N.E.R.D.', -100, -189, 172.5, 57.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1535322126897-XK08TKAWOFU2HS9X0XOX/NERD_cover.jpg?format=1500w', 'https://dyanjong.com/#/nerd/'), // more personal but very digital
-                    new Node('SOME x Y', 404, -99, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1520636885475-LYM2YRB77S6Z5BQT2GG0/SXY2_smoketitle.gif?format=1500w', 'https://dyanjong.com/#/some-x-y/'), // commisioned mildly digital
-                    new Node('The Neighbourhood', 418, -173, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1520633919732-XHBAGDDJXGEVI0379HOW/NBHD_row.gif?format=1500w', 'https://dyanjong.com/#/the-neighbourhood/'), // commisioned digital
-                    new Node('The Laterals | Lili Reinhart', -153, -200, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1507743640395-OK1OS3LZYFS2F5SSF7KM/LR_01b.gif?format=1500w', 'https://dyanjong.com/#/the-laterals-lili-reinhart/'), //commisioned/personal digital
-                    new Node('PHOTOGENICS + CO | LUCID FW16', 435, 52, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1505813469799-80IIZFJPXO0LUFDNSNNH/Photogenics_title.gif?format=1500w', 'https://dyanjong.com/#/photogenics-co-lucid-fw16/'), //commisioned physical/digital
+                    new Node('AMAZON MUSIC JP | MIYAVI VIRTUAL 5.0: SYNTHESIS', 206, -80, 162.5, 83.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/8c9f0629-a428-46f2-ba35-c1421da481ae/EqUqUfzUwAAxmPC.jpeg?format=1500w', 'https://dyanjong.com/amazon-music-jp-miyavi-virtual-50-synthesis/'), // deep commisioned digital
+                    new Node('Hollis | Sedative Live', -93, -81, 112.5, 56.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1589329705878-JDOYVKYMWGXTP0PKGYTN/892199038_1080.jpg?format=1500w', 'https://dyanjong.com/hollis-sedative-live/'), // lightly commisioned physical/digital more digtal
+                    new Node('Berhana | Golden Medley', 69, -147, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/225b1533-dff9-459e-9dbb-e67859bb9470/400179569.jpg?format=1500w', 'https://dyanjong.com/berhana-golden-medley/'), // commisioned digital
+                    new Node('Berhana | Lucky Strike', 21, -200, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/db10c970-977b-4b66-8c4d-65a60b4077ad/400177624.jpg?format=1500w', 'https://dyanjong.com/berhana-lucky-strike/'), // commisioned digital
+                    new Node('Netflix | Emmys Party Motion Studio', 354, 204, 150, 86.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/c245daf6-bf03-44ba-b0a3-d145c1341ad9/A004C004_190922FQ.01521372.MOV.17_36_48_09.STILL003.jpg?format=1500w', 'https://dyanjong.com/netflix-emmys-party-motion-studio/'), // commisioned physical
+                    new Node('Netflix | Stranger Things S3 Lookbook', 470, 250, 112.5, 86.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/cc68fa85-7738-482a-aff2-96a561cc70b0/Netflix_ST3_thumb.jpg?format=1500w', 'https://dyanjong.com/netflix-stranger-things-s3-lookbook/'), // commsioned physical
+                    new Node('Jessica Universe | Always', -137, 201, 101.25, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1579069136935-XCLIGJNZAP37EJXFUGI8/JU_Always.jpg?format=1500w', 'https://dyanjong.com/jessica-universe-always/'), // commisioned/personal physical
+                    new Node('FLAUNT | Poppy', -100, 96, 86.25, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1571599394547-Q6IRR8RNJS6VM6BSMG8I/167%2Bflaunt%2Bmagazine%2Bpoppy%2Bdigital%2Bv2.jpg?format=1500w', 'https://dyanjong.com/flaunt-poppy/'), // commisioned/personal physical/digital
+                    new Node('Kali Uchis | Dead to Me (Acoustic)', 36, 148, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1535330607257-MDGIVG2CO5458W8DJ4XY/Kali_cover.jpg?format=1500w', 'https://dyanjong.com/kali-uchis-dead-to-me-acoustic/'), // commisioned physical/digital
+                    new Node('QUIÑ | MATH (Director\'s Cut)', -186, 17, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/1d335660-11dd-444d-8559-909a0343334e/Quin+Math+%281%29.jpg?content-type=image%2Fjpeg', 'https://dyanjong.com/quin-math-directors-cut/'), // commisioned/personal physical/digital
+                    new Node('QUIÑ | Galacticat', -218, -7, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/852d899c-66b4-4917-8c6b-2e00496ad7aa/Galacticat+%281%29.jpg?content-type=image%2Fjpeg', 'https://dyanjong.com/quin-galacticat/'), // commisioned/personal physical/digital
+                    new Node('The Laterals | MIYAVI', -296, -24, 112.5, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1578025554776-DAG5FTK7X99YMHCN32YK/DSC09110.jpg?format=1500w', 'https://dyanjong.com/the-laterals-miyavi/'), // commisoned/personal more physical/digital
+                    new Node('BILLIE EILISH', -92, 242, 112.5, 71.25, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1540833062786-K9UMG56A7F5FBUOGABJX/Billie_light3.gif?format=1500w', 'https://dyanjong.com/billie-eilish/'), // personal/closer to commisioned physical
+                    new Node('The Laterals | Eve Hewson', -169, -42, 112.5, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1543086341795-OYNIDB26AW4EQEFVW0YW/DSC09852.jpg?format=1500w', 'https://dyanjong.com/the-laterals-eve-hewson/'), // commisioned/personal physical/close digital
+                    new Node('Character Media | Ian Alexander', 385, -200, 80, 110, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/4613476b-9bfb-48b1-a38f-70f21a485216/IA_08021s.jpg?format=1500w', 'https://dyanjong.com/character-media-ian-alexander/'), //digital commisioned
+                    new Node('N.E.R.D.', -100, -189, 172.5, 57.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1535322126897-XK08TKAWOFU2HS9X0XOX/NERD_cover.jpg?format=1500w', 'https://dyanjong.com/nerd/'), // more personal but very digital
+                    new Node('SOME x Y', 404, -99, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1520636885475-LYM2YRB77S6Z5BQT2GG0/SXY2_smoketitle.gif?format=1500w', 'https://dyanjong.com/some-x-y/'), // commisioned mildly digital
+                    new Node('The Neighbourhood', 418, -173, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1520633919732-XHBAGDDJXGEVI0379HOW/NBHD_row.gif?format=1500w', 'https://dyanjong.com/the-neighbourhood/'), // commisioned digital
+                    new Node('The Laterals | Lili Reinhart', -153, -200, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1507743640395-OK1OS3LZYFS2F5SSF7KM/LR_01b.gif?format=1500w', 'https://dyanjong.com/the-laterals-lili-reinhart/'), //commisioned/personal digital
+                    new Node('PHOTOGENICS + CO | LUCID FW16', 435, 52, 112.5, 63.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1505813469799-80IIZFJPXO0LUFDNSNNH/Photogenics_title.gif?format=1500w', 'https://dyanjong.com/photogenics-co-lucid-fw16/'), //commisioned physical/digital
                     new Node('The Huntington | Green Boy 3D Scan', -567, -20, 120, 120, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/0ef745fa-a17f-450f-9040-a71a8a472463/7_31_2025-snapshot-2025-08-03_22-31-35.png', 'https://dyanjong.com/the-huntington-green-boy-3d-scan/'), // personal slightly digital
                     new Node('Reality Hack at MIT | Rescue Ready VR', -313, -148, 182.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/fad14cde-c2ad-4650-b8b5-7db24ab0ae4f/RescueReadyVR_thumb.jpg', 'https://dyanjong.com/reality-hack-at-mit-rescue-ready-vr/'), // personal digital
                     new Node('Postcard Cabins | Artist Fellowship', -551, 250, 75, 97.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/97afbe02-389b-4b19-958e-2b9dbba1c106/Getaway_flowers_s.jpg', 'https://dyanjong.com/postcard-cabins/'), // personal physical
                     // new Node('Cyanotypes', -537, 196, 86.25, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1706141763759-0KH47QYMU06YYX1CJGF9/Dimples_alstroemeria_blue.jpg', 'https://dyanjong.com/cyanotypes/'), // personal physical
                     new Node('Cinespace 2020 | Baobei', -344, -200, 172.5, 112.5, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1595052297041-VDOJ734PVI9RRFZ6AF1V/image-asset.jpeg', 'https://dyanjong.com/cinespace-2020-baobei/'), //personal digital
                     new Node('ALBUMTONES', -409, -183, 100, 120, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/0974d602-851f-49ac-a079-ba4d5aa280e7/Screenshot+2025-12-01+at+9.12.32%E2%80%AFPM.png', 'https://dyanjong.com/albumtones/'), // personal digital
-                    new Node('EDEN MCMXCV', 130, -150, 100, 180, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1508363624769-7Q6FWKKX78TRZGAABF52/E_2027.jpg?format=1000w', 'https://dyanjong.com/#/eden-mcmxcv/'), // DIGITAL COMMISSIONED
-                    new Node('Deux Hommes | Dysmorphia', -20, -120, 100, 180, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1455309466428-YYA5ENIXE55QXY8BT017/AshtonMichael_Justin_slice_floorless.gif?format=1000w', 'https://dyanjong.com/#/deux-hommes-dysmorphia/'), // DIGITAL PERSONAL (close to axis)
-                    new Node('The 1975 at the Palladium', -90, -170, 100, 160, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1765134673321-P8IPT7GAXIDS6TNLAPFJ/1975-5192.jpg?format=1000w', 'https://dyanjong.com/#/the-1975-at-the-palladium/'), // DIGITAL PERSONAL (close to axis)
-                    new Node('Photogenics Mag | ALTERED STATE', 250, -120, 120, 160, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1550265313473-FWT1S8ZQRO3MUACFR3LH/Svetlana_mirror.gif?format=1000w', 'https://dyanjong.com/#/photogenics-altered-state/'), // DIGITAL COMMISSIONED
-                    new Node('LA Canvas | Jarell Perry', 55, -130, 100, 180, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/5ce1cf31-75cf-463d-b0de-abe0d318958e/Jarell_5073_crop.jpg?format=1000w', 'https://dyanjong.com/#/la-canvas-jarell-perry/'), // DIGITAL PERSONAL (close to axis)
-                    new Node('The Laterals | Yuna', 320, -140, 150, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1508369424259-0TBSVFKYK93JDVAD6P01/YUNA_stairs.gif?format=1000w', 'https://dyanjong.com/#/the-laterals-yuna/'), // DIGITAL COMMISSIONED
-                    new Node('W Magazine | Rachel Keller', 340, -110, 100, 180, "https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1513831282889-KF255HNUGOOHQOYWTKXJ/IMG_2473.JPG?format=1000w", "https://dyanjong.com/#/w-rachel-keller/"), // DIGITAL COMMISSIONED
+                    new Node('EDEN MCMXCV', 130, -150, 100, 180, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1508363624769-7Q6FWKKX78TRZGAABF52/E_2027.jpg?format=1000w', 'https://dyanjong.com/eden-mcmxcv/'), // DIGITAL COMMISSIONED
+                    new Node('Deux Hommes | Dysmorphia', -20, -120, 100, 180, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1455309466428-YYA5ENIXE55QXY8BT017/AshtonMichael_Justin_slice_floorless.gif?format=1000w', 'https://dyanjong.com/deux-hommes-dysmorphia/'), // DIGITAL PERSONAL (close to axis)
+                    new Node('The 1975 at the Palladium', -90, -170, 100, 160, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1765134673321-P8IPT7GAXIDS6TNLAPFJ/1975-5192.jpg?format=1000w', 'https://dyanjong.com/the-1975-at-the-palladium/'), // DIGITAL PERSONAL (close to axis)
+                    new Node('Photogenics Mag | ALTERED STATE', 250, -120, 120, 160, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1550265313473-FWT1S8ZQRO3MUACFR3LH/Svetlana_mirror.gif?format=1000w', 'https://dyanjong.com/photogenics-altered-state/'), // DIGITAL COMMISSIONED
+                    new Node('LA Canvas | Jarell Perry', 55, -130, 100, 180, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/5ce1cf31-75cf-463d-b0de-abe0d318958e/Jarell_5073_crop.jpg?format=1000w', 'https://dyanjong.com/la-canvas-jarell-perry/'), // DIGITAL PERSONAL (close to axis)
+                    new Node('The Laterals | Yuna', 320, -140, 150, 100, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1508369424259-0TBSVFKYK93JDVAD6P01/YUNA_stairs.gif?format=1000w', 'https://dyanjong.com/the-laterals-yuna/'), // DIGITAL COMMISSIONED
+                    new Node('W Magazine | Rachel Keller', 340, -110, 100, 180, "https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1513831282889-KF255HNUGOOHQOYWTKXJ/IMG_2473.JPG?format=1000w", "https://dyanjong.com/w-rachel-keller/"), // DIGITAL COMMISSIONED
 
-                    new Node('Readymade Cabret', -507, -200, 150, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/176dacd1-25e7-46f0-9f45-3b6cc7774199/Jonathan+Dada+Poem+1+best.png?format=1500w', 'https://dyanjong.com/personal#/readymade-cabaret-20/'), // digital personal
-                    new Node('#SAVE OUR STAGES(AR)', -325, -75, 155, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/163b3803-daa9-48fb-be62-3fae635a2ec0/giphy.gif?format=1500w', 'https://dyanjong.com/personal#/save-our-stages//'), // digital personal
+                    new Node('Readymade Cabret', -507, -200, 150, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/176dacd1-25e7-46f0-9f45-3b6cc7774199/Jonathan+Dada+Poem+1+best.png?format=1500w', 'https://dyanjong.com/readymade-cabaret-20/'), // digital personal
+                    new Node('#SAVE OUR STAGES(AR)', -325, -75, 155, 75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/163b3803-daa9-48fb-be62-3fae635a2ec0/giphy.gif?format=1500w', 'https://dyanjong.com/save-our-stages/'), // digital personal
 
                     new Node("Spectrum (2023)", -283, 190, 150, 93.75, 'https://studiodyanjong.com/assets/images/image07.gif?v=c3941204', 'https://studiodyanjong.com/'), //personal physical
                     new Node("Prototype II (2022)", -473, 249, 150, 93.75, 'https://studiodyanjong.com/assets/images/image16.jpg?v=c3941204', 'https://studiodyanjong.com/'), //personal physical
@@ -408,12 +466,12 @@
                     new Node("Welcome (2020)", -425, 200, 150, 93.75, 'https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/c7881af5-6c08-4374-81df-16695604f049/Welcome+1.jpg?content-type=image%2Fjpeg', 'https://studiodyanjong.com/'), //personal physical
                     new Node("Beyond Garden (2020)", -597, -131, 150, 93.75, 'https://studiodyanjong.com/assets/images/image10.jpg?v=c3941204', 'https://studiodyanjong.com/'), //personal digital
                     new Node("Prototype I (2020)", -488, 50, 150, 93.75, 'https://studiodyanjong.com/assets/images/image18.gif?v=c3941204', 'https://studiodyanjong.com/'), //personal physical
-                    new Node("Autonomy (2020)", -268, 100, 150, 93.75, 'https://studiodyanjong.com/assets/images/image13.jpg?v=c3941204', 'https://studiodyanjong.com/'), //personal physical
+                    new Node("Autonomy (2020)", -218, 100, 150, 93.75, 'https://studiodyanjong.com/assets/images/image13.jpg?v=c3941204', 'https://studiodyanjong.com/'), //personal physical
                     new Node("Signal (2019)", -555, 200, 150, 93.75, 'https://studiodyanjong.com/assets/images/image19.gif?v=c3941204', 'https://studiodyanjong.com/'),//personal physical
-                    new Node("Arrival (2018)", -330, 100, 150, 93.75, 'https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/4c465078-b679-4e16-9f5c-27a1a54cc396/Arrival+1.jpg?content-type=image%2Fjpeg', 'https://studiodyanjong.com/'),//personal physical
+                    new Node("Arrival (2018)", -330, 150, 190, 93.75, 'https://images.squarespace-cdn.com/content/56415ecbe4b0d6710e2cde00/4c465078-b679-4e16-9f5c-27a1a54cc396/Arrival+1.jpg?content-type=image%2Fjpeg', 'https://studiodyanjong.com/'),//personal physical
                     new Node("Transcend (2018)", -376, 270, 150, 93.75, 'https://studiodyanjong.com/assets/images/image20.gif?v=c3941204', 'https://studiodyanjong.com/'),//personal physical
                     new Node("Resilience (2017)", -601, 100, 150, 93.75, 'https://studiodyanjong.com/assets/images/image11.jpg?v=c3941204', 'https://studiodyanjong.com/'),//personal physical
-                    new Node("George Maple | Sticks & Horses", 460, -160, 150, 93.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1505813683059-F8WOCDGJK79A6Z1I6WMG/GM_projector.gif?format=1500w', 'https://dyanjong.com/#/george-maple/'), // DIGITAL COMMISSIONED
+                    new Node("George Maple | Sticks & Horses", 460, -160, 150, 93.75, 'https://images.squarespace-cdn.com/content/v1/56415ecbe4b0d6710e2cde00/1505813683059-F8WOCDGJK79A6Z1I6WMG/GM_projector.gif?format=1500w', 'https://dyanjong.com/george-maple/'), // DIGITAL COMMISSIONED
                 ];
                 this.nodeContainers = new Map();
                 this.graph = document.getElementById('graph');
@@ -680,18 +738,32 @@
                 
                 // Add hover event listeners (for desktop)
                 containerElement.addEventListener('mouseenter', () => {
+                    // Clear any existing timeout
+                    if (containerElement.hoverTimeout) {
+                        clearTimeout(containerElement.hoverTimeout);
+                    }
                     
                     node.isActive = true;
-                    containerElement.classList.add('node-hover');
-                    containerElement.style.transition = "transform 0.3s ease";
-                    // Use constrained transform to keep node within bounds
-                    const constrainedTransform = this.getConstrainedTransform(containerElement, 4);
-                    containerElement.style.transform = constrainedTransform;
-                    labelElement.style.opacity = 1;
-                    node.onHover();
+                    
+                    // Add delay before scaling
+                    containerElement.hoverTimeout = setTimeout(() => {
+                        containerElement.classList.add('node-hover');
+                        containerElement.style.transition = "transform 0.3s ease";
+                        // Use constrained transform to keep node within bounds
+                        const constrainedTransform = this.getConstrainedTransform(containerElement, 4);
+                        containerElement.style.transform = constrainedTransform;
+                        labelElement.style.opacity = 1;
+                        node.onHover();
+                    }, 300); // 300ms delay
                 });
                 
                 containerElement.addEventListener('mouseleave', () => {
+                    // Clear the hover timeout if mouse leaves before delay completes
+                    if (containerElement.hoverTimeout) {
+                        clearTimeout(containerElement.hoverTimeout);
+                        containerElement.hoverTimeout = null;
+                    }
+                    
                     node.onLeave();
                     node.isActive = false;
                     containerElement.style.transition = "transform 1s ease";
